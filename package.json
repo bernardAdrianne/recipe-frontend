@@ -46,6 +46,7 @@
 		"lucide-svelte": "^0.511.0",
 		"mongodb": "^6.16.0",
 		"ollama": "^0.5.17",
+		"serverless-http": "^3.2.0",
 		"svelte-simple-modal": "^2.0.0"
 	}
 }
