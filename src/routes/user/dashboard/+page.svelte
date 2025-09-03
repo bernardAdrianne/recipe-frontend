@@ -263,7 +263,17 @@
 
   <!-- Main Content -->
   {#if isLoading}
-    <div class="text-center text-gray-600 my-12">Loading recipes...</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    {#each Array(6) as _}
+      <div class="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+        <div class="bg-gray-300 h-48 w-full"></div>
+        <div class="p-4 space-y-3">
+          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+          <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+        </div>
+      </div>
+    {/each}
+  </div>
   {:else if !hasSearched}
     <div class="text-center text-gray-500 my-12 text-lg font-medium">
       Start searching by clicking the <strong>Search by Ingredients</strong> button above.
@@ -274,34 +284,44 @@
     </div>
   {:else}
     <!-- Recipe Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {#each paginatedRecipes as recipe}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg">
-          <div class="cursor-pointer" on:click={() => openRecipeModal(recipe.id)}>
-            <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
-            <h2 class="text-lg font-semibold text-gray-800 p-4">
-              {recipe.title}
-            </h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+  {#each paginatedRecipes as recipe}
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden transform transition hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+      on:click={() => openRecipeModal(recipe.id)}
+    >
+      <!-- Image + Category Badge -->
+      <div class="relative">
+        <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
+        {#if recipe.category}
+          <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+            {recipe.category}
           </div>
+        {/if}
+      </div>
 
-          <div class="px-4 pb-4 flex justify-between items-center">
-            {#if recipe.category}
-              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{recipe.category}</span>
-            {/if}
-            <button
-              type="button"
-              class={`text-sm px-3 py-1 rounded transition 
-                ${recipe.saved 
-                  ? 'bg-red-600 text-white hover:bg-red-700' 
-                  : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
-              on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
-            >
-              {recipe.saved ? 'Unsave' : 'Save'}
-            </button>
-          </div>
-        </div>
-      {/each}
+      <!-- Title + Extra Info -->
+      <div class="p-4">
+        <h2 class="text-lg font-semibold text-gray-800">{recipe.title}</h2>
+      </div>
+
+      <!-- Save Button -->
+      <div class="px-4 pb-4 flex justify-end items-center">
+        <button
+          type="button"
+          class={`text-sm px-3 py-1 rounded transition 
+            ${recipe.saved 
+              ? 'bg-red-600 text-white hover:bg-red-700' 
+              : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
+          on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
+        >
+          {recipe.saved ? 'Unsave' : 'Save'}
+        </button>
+      </div>
     </div>
+  {/each}
+</div>
+
 
     <!-- Pagination -->
     {#if totalPages > 1}

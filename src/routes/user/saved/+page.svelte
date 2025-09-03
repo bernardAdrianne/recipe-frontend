@@ -107,9 +107,10 @@
 
 </script>
 
+<!-- Saved Recipes Dashboard -->
 <section class="max-w-7xl mx-auto px-4 py-8">
   <h1 class="text-2xl font-bold text-center mb-6">Saved Recipes</h1>
-  
+
   {#if message}
     <p
       transition:fade
@@ -122,17 +123,29 @@
   {#if savedRecipes.length === 0}
     <p class="text-center text-gray-600">No saved recipes yet.</p>
   {:else}
-    <!-- Recipe grid -->
+    <!-- Recipe Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {#each paginatedRecipes as recipe}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden transition hover:shadow-lg">
-          <!-- Clickable area opens modal -->
-          <div class="cursor-pointer" on:click={() => openRecipeModal(recipe._id)}>
+        <div
+          class="bg-white rounded-xl shadow-md overflow-hidden transform transition hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+          on:click={() => openRecipeModal(recipe._id)}
+        >
+          <!-- Image + Category Badge -->
+          <div class="relative">
             <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover" />
-            <h2 class="text-lg font-semibold text-gray-800 p-4">{recipe.title}</h2>
+            {#if recipe.category}
+              <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                {recipe.category}
+              </div>
+            {/if}
           </div>
 
-          <!-- Unsave button -->
+          <!-- Title + Info -->
+          <div class="p-4">
+            <h2 class="text-lg font-semibold text-gray-800">{recipe.title}</h2>
+          </div>
+
+          <!-- Unsave Button -->
           <div class="px-4 pb-4 flex justify-end">
             <button
               class="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
@@ -145,7 +158,6 @@
       {/each}
     </div>
 
-    
     <!-- Pagination -->
     <div class="flex justify-center mt-8 gap-4">
       <button
@@ -168,9 +180,12 @@
     </div>
   {/if}
 
-    <!-- Recipe Details Modal -->
+  <!-- Recipe Details Modal -->
   {#if showModal && selectedRecipe}
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" on:click={closeModal}>
+    <div
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      on:click={closeModal}
+    >
       <div
         class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fadeIn relative"
         role="dialog"
@@ -180,7 +195,7 @@
       >
         <!-- Image + Title -->
         <div class="relative">
-          <img src={selectedRecipe.image} alt={selectedRecipe.title} class="w-full h-64 object-cover"/>
+          <img src={selectedRecipe.image} alt={selectedRecipe.title} class="w-full h-64 object-cover" />
           <button
             type="button"
             class="absolute top-3 right-3 z-10 flex items-center justify-center 
@@ -201,7 +216,9 @@
         <!-- Details -->
         <div class="p-6 max-h-[65vh] overflow-y-auto">
           {#if selectedRecipe.category}
-            <p class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mb-4">{selectedRecipe.category}</p>
+            <p class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mb-4">
+              {selectedRecipe.category}
+            </p>
           {/if}
 
           <h3 class="text-lg font-semibold text-gray-800 mb-2">Ingredients</h3>
@@ -232,4 +249,3 @@
     animation: fadeIn 0.25s ease-out;
   }
 </style>
-
