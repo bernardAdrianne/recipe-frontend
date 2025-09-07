@@ -12,6 +12,9 @@
     saved: boolean;
   }
 
+  let topAIRecipes: Recipe[] = [];
+  let otherAIRecipes: Recipe[] = []; 
+  let remainingRecipes: Recipe[] = [];
   let showModal = false;
   let selectedRecipe: Recipe | null = null;
   let isLoading = false;
@@ -68,10 +71,25 @@
         recipes = recipes.map(r =>
           r.id === id ? { ...r, saved: !saved } : r
         );
-        if (selectedRecipe && selectedRecipe.id === id) {
-          selectedRecipe = { ...selectedRecipe, saved: !saved };
-        }
+        topAIRecipes = topAIRecipes.map(r =>
+        r.id === id ? { ...r, saved: !saved } : r
+      );
+
+      // update in otherAIRecipes
+      otherAIRecipes = otherAIRecipes.map(r =>
+        r.id === id ? { ...r, saved: !saved } : r
+      );
+
+      // update in remainingRecipes if needed
+      remainingRecipes = remainingRecipes.map(r =>
+        r.id === id ? { ...r, saved: !saved } : r
+      );
+
+      // also update modal if it's open
+      if (selectedRecipe && selectedRecipe.id === id) {
+        selectedRecipe = { ...selectedRecipe, saved: !saved };
       }
+    }
     } catch (err) {
       console.error(err);
     }
@@ -174,6 +192,10 @@
       steps: r.steps || [],
       saved: savedIds.includes(r._id?.toString() || r.id),
     }));
+
+    topAIRecipes = recipes.slice(0, 3);
+    otherAIRecipes = recipes.length > 3 ? recipes.slice(3, 6) : [];
+    remainingRecipes = recipes.slice(6);
   } catch (err) {
     console.error("Failed to fetch AI search recipes:", err);
     recipes = [];
@@ -182,7 +204,6 @@
     ingredientsInput = "";
   }
 }
-
 
   // Filtering
   const recentCount = 3;
@@ -283,35 +304,116 @@
        No recipes match your ingredients.
     </div>
   {:else}
+
+  <!-- AI Recommendations -->
+{#if topAIRecipes.length > 0}
+  <h3 class="text-2xl font-bold text-gray-800 mb-4">Top AI Recommended Recipes</h3>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+    {#each topAIRecipes as recipe}
+      <div
+        class="bg-white rounded-xl shadow-md overflow-hidden transform transition hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+        on:click={() => openRecipeModal(recipe.id)}
+      >
+        <!-- Image + Category Badge -->
+        <div class="relative">
+          <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
+          {#if recipe.category}
+            <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+              {recipe.category}
+            </div>
+          {/if}
+        </div>
+
+        <!-- Title -->
+        <div class="p-4">
+          <h2 class="text-lg font-semibold text-gray-800">{recipe.title}</h2>
+        </div>
+
+        <!-- Save Button -->
+        <div class="px-4 pb-4 flex justify-end items-center">
+          <button
+            type="button"
+            class={`text-sm px-3 py-1 rounded transition 
+              ${recipe.saved 
+                ? 'bg-red-600 text-white hover:bg-red-700' 
+                : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
+            on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
+          >
+            {recipe.saved ? 'Unsave' : 'Save'}
+          </button>
+        </div>
+      </div>
+    {/each}
+  </div>
+{/if}
+
+
+  <!-- Least AI Recommended -->
+  {#if otherAIRecipes.length > 0}
+  <h3 class="text-xl font-semibold text-gray-600 mb-4">Least Relevant Recipes</h3>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+    {#each otherAIRecipes as recipe}
+      <div
+        class="bg-gray-50 rounded-xl shadow-sm overflow-hidden border border-gray-200 transform transition hover:scale-[1.01] cursor-pointer"
+        on:click={() => openRecipeModal(recipe.id)}
+      >
+        <div class="relative">
+          <img src={recipe.image} alt={recipe.title} class="w-full h-40 object-cover"/>
+        </div>
+
+        <!-- Title -->
+        <div class="p-4">
+          <h2 class="text-md font-medium text-gray-700">{recipe.title}</h2>
+        </div>
+
+        <!-- Save Button -->
+        <div class="px-4 pb-4 flex justify-end items-center">
+          <button
+            type="button"
+            class={`text-sm px-3 py-1 rounded transition 
+              ${recipe.saved 
+                ? 'bg-red-600 text-white hover:bg-red-700' 
+                : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
+            on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
+          >
+            {recipe.saved ? 'Unsave' : 'Save'}
+          </button>
+        </div>
+      </div>
+    {/each}
+  </div>
+{/if}
+
+
     <!-- Recipe Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+<!-- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
   {#each paginatedRecipes as recipe}
     <div
       class="bg-white rounded-xl shadow-md overflow-hidden transform transition hover:scale-[1.02] hover:shadow-lg cursor-pointer"
-      on:click={() => openRecipeModal(recipe.id)}
-    >
+      on:click={() => openRecipeModal(recipe.id)} 
+    >-->
       <!-- Image + Category Badge -->
-      <div class="relative">
+      <!-- <div class="relative">
         <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
         {#if recipe.category}
           <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
             {recipe.category}
           </div>
         {/if}
-      </div>
+      </div> -->
 
       <!-- Title + Extra Info -->
-      <div class="p-4">
+      <!-- <div class="p-4">
         <h2 class="text-lg font-semibold text-gray-800">{recipe.title}</h2>
-      </div>
+      </div> -->
 
-      <!-- Save Button -->
-      <div class="px-4 pb-4 flex justify-end items-center">
+      <!-- Save Button 
+      < <div class="px-4 pb-4 flex justify-end items-center">
         <button
           type="button"
           class={`text-sm px-3 py-1 rounded transition 
             ${recipe.saved 
-              ? 'bg-red-600 text-white hover:bg-red-700' 
+              ? 'bg-red-600 text-white hover:bg-red-700'  
               : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
           on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
         >
@@ -320,11 +422,10 @@
       </div>
     </div>
   {/each}
-</div>
-
+</div> --> 
 
     <!-- Pagination -->
-    {#if totalPages > 1}
+    <!-- {#if totalPages > 1}
       <div class="flex justify-center mt-8 gap-4">
         <button
           on:click={goToPrevPage}
@@ -342,7 +443,7 @@
           Next →
         </button>
       </div>
-    {/if}
+    {/if} -->
   {/if}
 
   <!-- Recipe Details Modal -->
