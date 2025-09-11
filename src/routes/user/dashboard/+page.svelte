@@ -236,14 +236,22 @@
 <section class="max-w-7xl mx-auto px-4 py-8">
 
   <!-- Search Button -->
-  <div class="flex justify-center mb-6">
-    <button
-      class="px-6 py-2 bg-[#228B22] text-white rounded-full shadow hover:bg-[#1a5f17] transition"
-      on:click={openSearchModal}
-    >
-      🔍 Search by Ingredients
-    </button>
-  </div>
+<div class="flex justify-center mb-6">
+  <button
+    class="btn relative overflow-hidden flex items-center gap-2 px-8 py-3 
+           border-2 border-[#228B22] 
+           text-black font-semibold rounded-full 
+           shadow-md transition-all duration-500 
+           hover:scale-105 hover:shadow-lg active:scale-95"
+    on:click={openSearchModal}
+  >
+    <!-- Icon + Text -->
+    <span class="relative z-10 transition-transform duration-500 group-hover:rotate-12">
+      🍳
+    </span>
+    <span class="relative z-10">Turn Ingredients into Recipes</span>
+  </button>
+</div>
 
   <!-- Ingredient Search Modal -->
   {#if showSearchModal}
@@ -295,15 +303,33 @@
       </div>
     {/each}
   </div>
-  {:else if !hasSearched}
-    <div class="text-center text-gray-500 my-12 text-lg font-medium">
-      Start searching by clicking the <strong>Search by Ingredients</strong> button above.
-    </div>
-  {:else if paginatedRecipes.length === 0}
-    <div class="text-center text-red-600 my-12 text-lg font-medium">
-       No recipes match your ingredients.
-    </div>
-  {:else}
+    {:else if !hasSearched}
+  <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+    <span class="text-6xl animate-bounce">🍽️</span>
+    <p class="text-gray-600 text-lg font-medium">I’m hungry... feed me some ingredients!</p>
+  </div>
+
+{:else if paginatedRecipes.length === 0}
+  <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+    <!-- Shaking Head Emoji -->
+    <span 
+      class="text-7xl animate-shake"
+    >
+      😩
+    </span>
+
+    <!-- Message -->
+    <p class="text-red-600 text-lg font-semibold">
+      No recipes match your ingredients.
+    </p>
+
+    <!-- Suggestion -->
+    <p class="text-gray-500 text-sm">
+      Try adding or changing your ingredients 🍅🥦🍗
+    </p>
+  </div>
+{:else}
+
 
   <!-- AI Recommendations -->
 {#if topAIRecipes.length > 0}
@@ -333,15 +359,25 @@
         <div class="px-4 pb-4 flex justify-end items-center">
           <button
             type="button"
-            class={`text-sm px-3 py-1 rounded transition 
-              ${recipe.saved 
-                ? 'bg-red-600 text-white hover:bg-red-700' 
-                : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
-            on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
-          >
-            {recipe.saved ? 'Unsave' : 'Save'}
-          </button>
-        </div>
+            class="flex items-center justify-center w-9 h-9 rounded-full 
+              transition-all duration-200 ease-in-out 
+              shadow-md hover:scale-110 active:scale-95
+                {recipe.saved 
+                ? 'bg-red-500 text-white hover:bg-red-500' 
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}"
+              on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
+               aria-label={recipe.saved ? "Remove Bookmark" : "Bookmark Recipe"}
+            >
+    {#if recipe.saved}
+      <!-- Solid Bookmark (Saved) -->
+      <i class="fa-solid fa-bookmark text-lg"></i>
+    {:else}
+      <!-- Regular Bookmark (Not Saved) -->
+      <i class="fa-regular fa-bookmark text-lg"></i>
+    {/if}
+  </button>
+</div>
+
       </div>
     {/each}
   </div>
@@ -357,8 +393,14 @@
         class="bg-gray-50 rounded-xl shadow-sm overflow-hidden border border-gray-200 transform transition hover:scale-[1.01] cursor-pointer"
         on:click={() => openRecipeModal(recipe.id)}
       >
+        <!-- Image + Category Badge -->
         <div class="relative">
-          <img src={recipe.image} alt={recipe.title} class="w-full h-40 object-cover"/>
+          <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
+          {#if recipe.category}
+            <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+              {recipe.category}
+            </div>
+          {/if}
         </div>
 
         <!-- Title -->
@@ -370,15 +412,25 @@
         <div class="px-4 pb-4 flex justify-end items-center">
           <button
             type="button"
-            class={`text-sm px-3 py-1 rounded transition 
-              ${recipe.saved 
-                ? 'bg-red-600 text-white hover:bg-red-700' 
-                : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
-            on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
-          >
-            {recipe.saved ? 'Unsave' : 'Save'}
-          </button>
-        </div>
+            class="flex items-center justify-center w-9 h-9 rounded-full 
+              transition-all duration-200 ease-in-out 
+              shadow-md hover:scale-110 active:scale-95
+                {recipe.saved 
+                ? 'bg-red-500 text-white hover:bg-red-500' 
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}"
+              on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
+               aria-label={recipe.saved ? "Remove Bookmark" : "Bookmark Recipe"}
+            >
+    {#if recipe.saved}
+      <!-- Solid Bookmark (Saved) -->
+      <i class="fa-solid fa-bookmark text-lg"></i>
+    {:else}
+      <!-- Regular Bookmark (Not Saved) -->
+      <i class="fa-regular fa-bookmark text-lg"></i>
+    {/if}
+  </button>
+</div>
+
       </div>
     {/each}
   </div>
@@ -509,4 +561,65 @@
   .animate-fadeIn {
     animation: fadeIn 0.25s ease-out;
   }
+  .btn {
+  background: #ffffff;
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+}
+.btn::before,
+.btn::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: -50%;
+  right: -50%;
+  height: 0;
+  padding-bottom: 200%;
+  border-radius: 39%;
+  opacity: 0;
+  transition: transform 0s cubic-bezier(0.2, 0, 0.1, 1) 0.5s, opacity 0.5s cubic-bezier(0.2, 0, 0.1, 1);
+}
+.btn::before {
+  transform: translate3d(-10%, 4.8em, 0) rotate(330deg);
+  background: linear-gradient(
+    25deg,
+    rgba(34, 139, 34, 0.4),
+    rgba(34, 139, 34, 0)
+  );
+}
+.btn::after {
+  transform: translate3d(10%, 4.8em, 0) rotate(0deg);
+  background: linear-gradient(
+    70deg,
+    rgba(34, 139, 34, 0.4),
+    rgba(34, 139, 34, 0)
+  );
+}
+.btn:hover::before,
+.btn:hover::after {
+  transition: transform 2s ease 0s, opacity 0.2s ease;
+  opacity: 1;
+}
+.btn:hover::before {
+  transform: translate3d(-10%, -1em, 0) rotate(100deg);
+}
+.btn:hover::after {
+  transform: translate3d(10%, -1em, 0) rotate(180deg);
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-8px) rotate(-8deg); }
+  40% { transform: translateX(8px) rotate(8deg); }
+  60% { transform: translateX(-6px) rotate(-6deg); }
+  80% { transform: translateX(6px) rotate(6deg); }
+  100% { transform: translateX(0); }
+}
+
+.animate-shake {
+  display: inline-block;
+  animation: shake 0.6s ease-in-out infinite;
+}
+
 </style>

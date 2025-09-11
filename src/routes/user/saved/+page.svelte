@@ -109,7 +109,7 @@
 
 <!-- Saved Recipes Dashboard -->
 <section class="max-w-7xl mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold text-center mb-6">Saved Recipes</h1>
+  <h1 class="text-2xl font-bold text-center mb-6">My Bookmarks</h1>
 
   {#if message}
     <p
@@ -120,9 +120,22 @@
     </p>
   {/if}
 
-  {#if savedRecipes.length === 0}
-    <p class="text-center text-gray-600">No saved recipes yet.</p>
-  {:else}
+{#if savedRecipes.length === 0}
+  <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center">
+    <span class="text-6xl animate-bounce">🥣</span>
+
+    <!-- Message -->
+    <p class="text-red-600 text-lg font-semibold">
+      No bookmarks yet... 
+    </p>
+
+    <!-- Suggestion -->
+    <p class="text-gray-500 text-sm">
+      Start saving recipes you love!
+    </p>
+  </div>
+{:else}
+
     <!-- Recipe Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {#each paginatedRecipes as recipe}
@@ -146,14 +159,20 @@
           </div>
 
           <!-- Unsave Button -->
-          <div class="px-4 pb-4 flex justify-end">
-            <button
-              class="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
-              on:click|stopPropagation={() => toggleUnsave(recipe._id)}
-            >
-              Unsave
-            </button>
-          </div>
+        <div class="px-4 pb-4 flex justify-end items-center">
+          <button
+            type="button"
+            class="flex items-center justify-center w-9 h-9 rounded-full 
+                  transition-all duration-200 ease-in-out 
+                  shadow-md hover:scale-110 active:scale-95
+                  bg-red-500 text-white hover:bg-red-600"
+            on:click|stopPropagation={() => toggleUnsave(recipe._id)}
+            aria-label="Remove Bookmark"
+          >
+            <!-- Solid Bookmark (since it's saved) -->
+            <i class="fa-solid fa-bookmark text-lg"></i>
+          </button>
+        </div>
         </div>
       {/each}
     </div>

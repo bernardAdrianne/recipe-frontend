@@ -100,7 +100,7 @@
 	}
 </script>
 
-<header class="bg-[#228B22] shadow-xl">
+<header class="bg-[#228B22] shadow-xl backdrop-blur-md shadow-md">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="flex justify-between items-center h-16">
 
@@ -158,7 +158,7 @@
         		class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
       		>
         		<a href="/user/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-        		<a href="/user/saved" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Saved</a>
+        		<a href="/user/saved" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Bookmarked</a>
         		<button
 					on:click={confirmLogout}
 					class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
