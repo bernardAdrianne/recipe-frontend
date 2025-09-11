@@ -178,11 +178,25 @@
     const data = await res.json();
     const list = data.results || [];
 
-    // Mark saved recipes
-    const savedRes = await fetch('https://airecipe-backend-2.onrender.com/api/saved/', { credentials: 'include' });
-    const savedData = await savedRes.json();
-    const savedIds = (savedData.results || []).map((r: any) => r._id.toString());
+    let savedIds: string[] = [];
 
+    // Try to fetch saved recipes (ignore if user not logged in)
+    try {
+      const savedRes = await fetch("https://airecipe-backend-2.onrender.com/api/saved", {
+        credentials: "include",
+      });
+
+      if (savedRes.ok) {
+        const savedData = await savedRes.json();
+        savedIds = (savedData.results || []).map((r: any) => r._id.toString());
+      } else {
+        console.warn("Not logged in or failed to fetch saved recipes");
+      }
+    } catch (err) {
+      console.warn("Skipping saved recipes fetch:", err);
+    }
+
+    // Build recipe objects
     recipes = list.map((r: any) => ({
       id: r._id?.toString() || r.id,
       title: r.title,
@@ -193,6 +207,7 @@
       saved: savedIds.includes(r._id?.toString() || r.id),
     }));
 
+    // Split into groups for UI
     topAIRecipes = recipes.slice(0, 3);
     otherAIRecipes = recipes.length > 3 ? recipes.slice(3, 6) : [];
     remainingRecipes = recipes.slice(6);
