@@ -57,8 +57,8 @@
   async function toggleSave(id: string, saved: boolean) {
     try {
       const url = saved
-        ? 'http://localhost:3000/api/unsave'
-        : 'http://localhost:3000/api/save';
+        ? 'https://airecipe-backend-2.onrender.com/api/unsave'
+        : 'https://airecipe-backend-2.onrender.com/api/save';
 
       const res = await fetch(url, {
         method: 'POST',
@@ -98,11 +98,11 @@
   async function fetchRecipes() {
     isLoading = true;
     try {
-      const allRes = await fetch('http://localhost:3000/api/recipe/all', { credentials: 'include' });
+      const allRes = await fetch('https://airecipe-backend-2.onrender.com/api/recipe/all', { credentials: 'include' });
       const allData = await allRes.json();
       let list = allData.results || allData.recipes || [];
 
-      const savedRes = await fetch('http://localhost:3000/api/saved/', { credentials: 'include' });
+      const savedRes = await fetch('https://airecipe-backend-2.onrender.com/api/saved/', { credentials: 'include' });
       const savedData = await savedRes.json();
       const savedIds = (savedData.results || []).map((r: any) => r._id.toString());
 
@@ -125,7 +125,7 @@
 
   async function fetchRecipeById(id: string) {
     try {
-      const res = await fetch(`http://localhost:3000/api/recipe/${id}`, { credentials: 'include' });
+      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/${id}`, { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch recipe');
       const data = await res.json();
       return data.results;
@@ -164,7 +164,7 @@
 
   try {
     const res = await fetch(
-      `http://localhost:3000/api/recipe/search?ingredient=${encodeURIComponent(ingredientsInput)}`,
+      `https://airecipe-backend-2.onrender.com/api/recipe/search?ingredient=${encodeURIComponent(ingredientsInput)}`,
       { credentials: 'include' }
     );
 
@@ -179,7 +179,7 @@
     const list = data.results || [];
 
     // Mark saved recipes
-    const savedRes = await fetch('http://localhost:3000/api/saved/', { credentials: 'include' });
+    const savedRes = await fetch('https://airecipe-backend-2.onrender.com/api/saved/', { credentials: 'include' });
     const savedData = await savedRes.json();
     const savedIds = (savedData.results || []).map((r: any) => r._id.toString());
 
