@@ -246,10 +246,10 @@
     on:click={openSearchModal}
   >
     <!-- Icon + Text -->
-    <span class="relative z-10 transition-transform duration-500 group-hover:rotate-12">
+    <span class="text-lg *:relative z-10 transition-transform duration-500 group-hover:rotate-12">
       🍳
     </span>
-    <span class="relative z-10">Turn Ingredients into Recipes</span>
+    <span class="text-lg relative z-10">Turn Ingredients into Recipes</span>
   </button>
 </div>
 
@@ -305,8 +305,8 @@
   </div>
     {:else if !hasSearched}
   <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-    <span class="text-6xl animate-bounce">🍽️</span>
-    <p class="text-gray-600 text-lg font-medium">I’m hungry... feed me some ingredients!</p>
+    <span class="text-7xl animate-bounce">🍽️</span>
+    <p class="text-gray-600 text-lg font-semibold">I’m hungry... feed me some ingredients!</p>
   </div>
 
 {:else if paginatedRecipes.length === 0}
@@ -324,7 +324,7 @@
     </p>
 
     <!-- Suggestion -->
-    <p class="text-gray-500 text-sm">
+    <p class="text-gray-500 text-lg">
       Try adding or changing your ingredients 🍅🥦🍗
     </p>
   </div>

@@ -28,7 +28,7 @@
             loading = true;
             errorMessage = "";
 
-            const res = await fetch('http://localhost:3000/api/auth/signup', {
+            const res = await fetch('https://airecipe-backend-1.onrender.com/api/auth/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -63,7 +63,7 @@
 <div class="flex flex-col items-center justify-center h-screen px-4">
     <!-- branding -->
     <div class="flex items-center gap-2 mb-4">
-        <h1 class="font-bold text-3xl text-[#115D33]">ReciPinoy</h1>
+        <h1 class="font-bold text-4xl text-[#115D33]">ReciPinoy</h1>
     </div>
     <p class="text-sm text-[#1e1e1e] font-semibold">Let's create your ReciPinoy account</p>
 

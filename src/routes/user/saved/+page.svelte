@@ -122,7 +122,7 @@
 
 {#if savedRecipes.length === 0}
   <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center">
-    <span class="text-6xl animate-bounce">🥣</span>
+    <span class="text-7xl animate-bounce">🥣</span>
 
     <!-- Message -->
     <p class="text-red-600 text-lg font-semibold">
@@ -130,7 +130,7 @@
     </p>
 
     <!-- Suggestion -->
-    <p class="text-gray-500 text-sm">
+    <p class="text-gray-500 text-lg">
       Start saving recipes you love!
     </p>
   </div>

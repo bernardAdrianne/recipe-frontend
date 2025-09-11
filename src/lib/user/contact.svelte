@@ -8,7 +8,7 @@
 
 <footer class="bg-[#F4F4F4] text-white py-10 mt-12 shadow-inner relative">
   <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-    <h1 class="text-2xl font-bold text-[#222222]">ReciPinoy</h1>
+    <h1 class="text-4xl font-bold text-[#222222]">ReciPinoy</h1>
 
     <div class="flex space-x-4 items-center">
       <button

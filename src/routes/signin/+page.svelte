@@ -20,7 +20,7 @@
             loading = true; // ✅ set loading state before request
             errorMessage = "";
 
-            const res = await fetch('http://localhost:3000/api/auth/signin', {
+            const res = await fetch('https://airecipe-backend-1.onrender.com/api/auth/signin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -50,7 +50,7 @@
 
 <div class="flex flex-col items-center justify-center h-screen px-4">
     <!-- Brand -->
-    <h1 class="font-bold text-3xl text-[#115D33] mb-4">ReciPinoy</h1>
+    <h1 class="font-bold text-4xl text-[#115D33] mb-4">ReciPinoy</h1>
     <p class="text-sm text-[#1e1e1e] font-semibold mb-8">Welcome back! Sign in to continue</p>
 
     <!-- Error Toast -->
