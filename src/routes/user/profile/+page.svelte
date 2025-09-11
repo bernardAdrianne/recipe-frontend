@@ -10,7 +10,7 @@
 
   onMount(async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/user/", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/", {
         method: "GET",
         credentials: "include",
       });
@@ -38,7 +38,7 @@
     if (!confirmed) return;
 
     try {
-      const res = await fetch("http://localhost:3000/api/user/", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/", {
         method: "DELETE",
         credentials: "include",
       });
