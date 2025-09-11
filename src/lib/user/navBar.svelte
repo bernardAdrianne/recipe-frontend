@@ -76,7 +76,7 @@
 		event.preventDefault();
 
 		try {
-			const res = await fetch('http://localhost:3000/api/auth/logout', {
+			const res = await fetch('https://airecipe-backend-2.onrender.com/api/auth/logout', {
 				method: 'POST',
 				credentials: 'include',
 			});

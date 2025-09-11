@@ -16,7 +16,7 @@
   
   async function toggleUnsave(id: string) {
     try {
-      const res = await fetch('http://localhost:3000/api/unsave', {
+      const res = await fetch('https://airecipe-backend-2.onrender.com/api/unsave', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -43,7 +43,7 @@
 
   async function fetchSavedRecipes() {
     try {
-      const res = await fetch('http://localhost:3000/api/saved', {
+      const res = await fetch('https://airecipe-backend-2.onrender.com/api/saved', {
         method: 'GET',
         credentials: 'include',
       });
@@ -62,7 +62,7 @@
 
   async function fetchRecipeById(id: string) {
     try {
-      const res = await fetch(`http://localhost:3000/api/recipe/${id}`, {
+      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/${id}`, {
         credentials: 'include'
       });
 
