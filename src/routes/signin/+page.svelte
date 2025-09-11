@@ -20,7 +20,7 @@
             loading = true; // ✅ set loading state before request
             errorMessage = "";
 
-            const res = await fetch('https://airecipe-backend-1.onrender.com/api/auth/signin', {
+            const res = await fetch('https://airecipe-backend-2.onrender.com/api/auth/signin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
