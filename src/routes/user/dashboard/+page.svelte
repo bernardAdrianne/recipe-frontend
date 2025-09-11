@@ -261,7 +261,7 @@
     on:click={openSearchModal}
   >
     <!-- Icon + Text -->
-    <span class="text-lg *:relative z-10 transition-transform duration-500 group-hover:rotate-12">
+    <span class="text-lg *:relative z-10 transition-transform duration-500 group-hover:rotate-22">
       🍳
     </span>
     <span class="text-lg relative z-10">Turn Ingredients into Recipes</span>
