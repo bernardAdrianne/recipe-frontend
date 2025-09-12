@@ -24,7 +24,7 @@
   let currentPage = 1;
   const itemsPerPage = 9;
 
-  // NEW: modal for ingredient search
+  // Modal for ingredient search
   let showSearchModal = false;
   let ingredientsInput = "";
   let hasSearched = false;
@@ -450,67 +450,6 @@
     {/each}
   </div>
 {/if}
-
-
-    <!-- Recipe Grid -->
-<!-- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-  {#each paginatedRecipes as recipe}
-    <div
-      class="bg-white rounded-xl shadow-md overflow-hidden transform transition hover:scale-[1.02] hover:shadow-lg cursor-pointer"
-      on:click={() => openRecipeModal(recipe.id)} 
-    >-->
-      <!-- Image + Category Badge -->
-      <!-- <div class="relative">
-        <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
-        {#if recipe.category}
-          <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-            {recipe.category}
-          </div>
-        {/if}
-      </div> -->
-
-      <!-- Title + Extra Info -->
-      <!-- <div class="p-4">
-        <h2 class="text-lg font-semibold text-gray-800">{recipe.title}</h2>
-      </div> -->
-
-      <!-- Save Button 
-      < <div class="px-4 pb-4 flex justify-end items-center">
-        <button
-          type="button"
-          class={`text-sm px-3 py-1 rounded transition 
-            ${recipe.saved 
-              ? 'bg-red-600 text-white hover:bg-red-700'  
-              : 'bg-[#228B22] text-white hover:bg-[#1a5f17]'}`}
-          on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
-        >
-          {recipe.saved ? 'Unsave' : 'Save'}
-        </button>
-      </div>
-    </div>
-  {/each}
-</div> --> 
-
-    <!-- Pagination -->
-    <!-- {#if totalPages > 1}
-      <div class="flex justify-center mt-8 gap-4">
-        <button
-          on:click={goToPrevPage}
-          class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition disabled:opacity-50"
-          disabled={currentPage === 1}
-        >
-          ← Back
-        </button>
-        <span class="text-gray-700 font-medium">Page {currentPage} of {totalPages}</span>
-        <button
-          on:click={goToNextPage}
-          class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition disabled:opacity-50"
-          disabled={currentPage === totalPages}
-        >
-          Next →
-        </button>
-      </div>
-    {/if} -->
   {/if}
 
   <!-- Recipe Details Modal -->

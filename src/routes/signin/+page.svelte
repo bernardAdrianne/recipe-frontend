@@ -17,7 +17,7 @@
         event.preventDefault();
 
         try {
-            loading = true; // ✅ set loading state before request
+            loading = true; // Set loading state before request
             errorMessage = "";
 
             const res = await fetch('https://airecipe-backend-2.onrender.com/api/auth/signin', {

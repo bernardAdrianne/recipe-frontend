@@ -100,7 +100,7 @@
 	}
 </script>
 
-<header class="bg-[#228B22] shadow-xl backdrop-blur-md shadow-md">
+<header class="bg-[#228B22] shadow-xl backdrop-blur-md">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="flex justify-between items-center h-16">
 
@@ -111,26 +111,6 @@
 
 		<!-- Navigation + Search -->
 		<div class="flex items-center space-x-6">
-
-		<!-- Search Bar -->
-		<!-- <form on:submit={handleSearch} class="relative">
-			<input
-				type="text"
-				bind:value={searchQuery}
-				placeholder="Search..."
-				class="pl-10 pr-4 py-2 rounded-full shadow-md bg-white text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[#222222]"
-			/>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					d="M21 21l-4.35-4.35M10.5 17a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13z" />
-				</svg>
-		</form> -->
 
 		<!-- Navigation Links -->
 		<div class="relative hidden md:flex space-x-6 items-center">

@@ -53,7 +53,7 @@
       }
 
       const data = await res.json();
-      recipes = data.results; // backend returns { results: [...] }
+      recipes = data.results;
     } catch (err) {
       console.error(err);
       recipes = [];
