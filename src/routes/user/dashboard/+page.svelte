@@ -273,7 +273,11 @@
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fadeIn relative">
         <button
-          class="absolute top-3 right-3 text-gray-500 hover:text-red-600 transition"
+          class="absolute top-3 right-3 text-gray-700
+                   w-9 h-9 rounded-full bg-white/80  
+                   shadow-md hover:bg-red-500 hover:text-white 
+                   transition-all duration-200 ease-in-out 
+                   hover:scale-110 active:scale-95"
           on:click={closeSearchModal}
         >
           ✖
@@ -285,6 +289,12 @@
           bind:value={ingredientsInput}
           placeholder="e.g. chicken, garlic, onion"
           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#228B22] mb-4"
+          on:keydown={(e) => {
+            if (e.key === "Enter" && ingredientsInput.trim()) {
+              e.preventDefault();
+              handleIngredientSearch();
+            }
+          }}
         />
         <div class="flex justify-end gap-3">
           <button
