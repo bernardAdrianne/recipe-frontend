@@ -50,7 +50,7 @@
       loading = true;
       showToast = false;
 
-      const res = await fetch('http://localhost:3000/api/auth/signin', {
+      const res = await fetch('https://recipe-frontend-eta-five.vercel.app/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

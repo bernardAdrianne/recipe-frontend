@@ -112,10 +112,10 @@ async function loadFeedback(reset = false) {
   loadingMore = true;
 
   try {
-    let url = `http://localhost:3000/api/feedback/all?page=${page}`;
+    let url = `https://recipe-frontend-eta-five.vercel.app/api/feedback/all?page=${page}`;
 
     if (sortBy === "all") {
-      url = `http://localhost:3000/api/feedback/all`;
+      url = `https://recipe-frontend-eta-five.vercel.app/api/feedback/all`;
     } else {
       url += `&limit=6&sort=${sortBy}`;
     }

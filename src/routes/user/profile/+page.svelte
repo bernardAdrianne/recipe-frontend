@@ -42,7 +42,7 @@
 
   onMount(async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/user/", {
+      const res = await fetch("https://recipe-frontend-eta-five.vercel.app/api/user/", {
         method: "GET",
         credentials: "include",
       });
@@ -72,7 +72,7 @@
   async function confirmDel() {
     deleting = true;
     try {
-      const res = await fetch("http://localhost:3000/api/user/", {
+      const res = await fetch("https://recipe-frontend-eta-five.vercel.app/api/user/", {
         method: "DELETE",
         credentials: "include",
       });

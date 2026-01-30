@@ -44,7 +44,7 @@
 
   async function toggleUnsave(id: string) {
     try {
-      const res = await fetch('http://localhost:3000/api/unsave', {
+      const res = await fetch('https://recipe-frontend-eta-five.vercel.app/api/unsave', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -65,7 +65,7 @@
 
   async function fetchSavedRecipes() {
     try {
-      const res = await fetch('http://localhost:3000/api/saved', {
+      const res = await fetch('https://recipe-frontend-eta-five.vercel.app/api/saved', {
         method: 'GET',
         credentials: 'include',
       });
