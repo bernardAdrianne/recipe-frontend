@@ -1,0 +1,155 @@
+    <script lang="ts">
+        import { goto } from '$app/navigation';
+        import { fade } from 'svelte/transition';
+        import { Mail, Lock, Eye, EyeOff } from "lucide-svelte";
+        import { isLoggedIn, user } from "../../lib/stores/userStore.js";
+
+        function navigateToSignup() {
+            goto('/signup');
+        }
+
+        let showPassword = false;
+        let email = "";
+        let password = "";
+        let loading = false;
+        let errorMessage = "";
+        
+        async function handleLogin(event: Event) {
+            event.preventDefault();
+
+            try {
+                loading = true; // Set loading state before request
+                errorMessage = "";
+
+                const res = await fetch('http://localhost:3000/api/auth/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include'
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    isLoggedIn.set(true);
+                    goto('/user/home');
+                    localStorage.removeItem('guestSearchCount');
+                } else {
+                    throw new Error(data.message || 'Signin failed');
+                }
+            } catch (err) {
+                if (err instanceof Error) {
+                    console.error('Error:', err.message);
+                    errorMessage = err.message; 
+                }
+            } finally {
+                loading = false; 
+            }
+        }
+    </script>
+
+
+    <div class="min-h-screen flex items-center justify-center bg-[#D2E4D2] px-4">
+  <form
+    class="bg-white border border-[#c4c4c4] w-full max-w-md rounded-3xl p-8 shadow-xl space-y-6"
+    on:submit|preventDefault={handleLogin}
+  >
+    <!-- Brand Logo -->
+    <div class="flex flex-col items-center mb-4">
+      <a href="/user/home" class="flex items-center gap-2">
+        <h1
+          class="text-3xl font-extrabold bg-gradient-to-r from-[#115D33] to-[#2d974d] 
+            text-transparent bg-clip-text"
+          style="font-family: 'Nunito Sans', sans-serif;"
+        >
+          ReciPinoy
+        </h1>
+      </a>
+
+      <p class="text-sm text-gray-700 mt-2 font-medium">
+        Welcome back! Sign in to continue
+      </p>
+    </div>
+
+    <!-- Error Toast -->
+    {#if errorMessage}
+      <div
+        transition:fade
+        class="fixed top-4 left-1/2 -translate-x-1/2 
+          bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg z-50"
+      >
+        {errorMessage}
+      </div>
+    {/if}
+
+    <!-- Email Input -->
+    <div class="relative">
+      <label for="email" class="block text-md text-gray-800 mb-2">
+        Email Address
+      </label>
+      <Mail class="absolute left-4 top-[47px] text-gray-400 w-5 h-5" />
+      <input
+        type="email"
+        bind:value={email}
+        placeholder="user@gmail.com"
+        required
+        class="pl-12 w-full p-4 rounded-xl border border-gray-200 text-gray-800 
+          focus:border-[#228B22] focus:ring-2 focus:ring-[#D2E4D2] outline-none"
+      />
+    </div>
+
+    <!-- Password Input -->
+    <div class="relative">
+      <label for="email" class="block text-md text-gray-800 mb-2">
+        Password
+      </label>
+      <Lock class="absolute left-4 top-[47px] text-gray-400 w-5 h-5" />
+      <input
+        type={showPassword ? 'text' : 'password'}
+        bind:value={password}
+        placeholder="Enter your password"
+        required
+        class="pl-12 w-full p-4 rounded-xl border border-gray-200 text-gray-800 
+          focus:border-[#228B22] focus:ring-2 focus:ring-[#D2E4D2] outline-none"
+      />
+
+      {#if password}
+        <button
+          type="button"
+          class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+          on:click={() => (showPassword = !showPassword)}
+        >
+          {#if showPassword}
+            <EyeOff class="w-5 h-5" />
+          {:else}
+            <Eye class="w-5 h-5" />
+          {/if}
+        </button>
+      {/if}
+    </div>
+
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      disabled={loading}
+      class="w-full bg-[#00A13E] text-white font-semibold p-4 rounded-xl 
+        shadow-md hover:scale-[1.02] hover:bg-[#228B22] transition 
+        disabled:opacity-60 disabled:cursor-not-allowed"
+    >
+      {loading ? 'Signing in...' : 'Continue'}
+    </button>
+
+    <!-- Bottom Text -->
+    <p class="text-center text-sm text-gray-600 mt-6">
+      Don’t have an account?
+      <span
+        class="text-[#115D33] font-semibold cursor-pointer hover:underline"
+        on:click={navigateToSignup}
+      >
+        Sign Up
+      </span>
+    </p>
+  </form>
+</div>

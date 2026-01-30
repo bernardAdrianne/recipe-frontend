@@ -1,6 +1,24 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
+  import Footer from "$lib/user/footer.svelte";
+  import Contact from "$lib/user/contact.svelte";
+  import {
+    BadgeCheck,
+    BadgeAlert,
+    Loader
+  } from "lucide-svelte";
+
+  let toastMessage = "";
+  let showToast = false;
+  let toastType: "success" | "error" = "success";
+  let toastPosition:
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right" = "top-right";
 
   let username = "";
   let password = "";
@@ -11,9 +29,20 @@
   let selectedFile: File | null = null;
   let fileInput: HTMLInputElement;
 
+  function triggerToast(message: string, 
+        type: "success" | "error" = "success", 
+        position: typeof toastPosition = "top-right") {
+    toastMessage = message;
+    toastType = type;
+    showToast = true;
+    toastPosition = position;
+    
+    setTimeout(() => (showToast = false), 3000);
+  }
+
   onMount(async () => {
     try {
-      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/", {
+      const res = await fetch("http://localhost:3000/api/user/", {
         method: "GET",
         credentials: "include",
         cache: "no-store",
@@ -25,6 +54,7 @@
       originalProfilePic = profilePic;
     } catch (err) {
       console.error("Failed to load profile:", err);
+      triggerToast("Failed to load profile.", "error", "top-center");
     }
   });
 
@@ -44,8 +74,7 @@
 
   async function handleSubmit() {
     if (password !== confirmPassword) {
-      successMessage = "⚠️ Passwords do not match.";
-      setTimeout(() => (successMessage = ""), 3000);
+      triggerToast("Passwords do not match.", "error", "top-center");
       return;
     }
 
@@ -57,7 +86,7 @@
         formData.append("profilePic", selectedFile);
         formData.append("folder", "profile-pictures");
 
-        const uploadRes = await fetch("https://airecipe-backend-2.onrender.com/api/user/upload-profile-picture", {
+        const uploadRes = await fetch("http://localhost:3000/api/user/upload-profile-picture", {
           method: "POST",
           body: formData,
           credentials: "include",
@@ -71,7 +100,7 @@
         }
       }
 
-      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/editprofile", {
+      const res = await fetch("http://localhost:3000/api/user/editprofile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +117,7 @@
 
       if (!res.ok) throw new Error(result.message || "Profile update failed");
 
-      successMessage = "✅ Profile updated successfully!";
+      triggerToast("Profile updated successfully!", "success", "top-right");
       setTimeout(() => {
         successMessage = "";
         window.location.href = "/user/profile";
@@ -100,21 +129,60 @@
   }
 </script>
 
-<section class="max-w-3xl mx-auto p-6">
-  <div class="bg-white shadow-xl rounded-2xl p-8 space-y-8">
-    <h2 class="text-2xl font-bold text-gray-900">Edit Profile</h2>
+<section class="min-h-screen flex flex-col max-w-3xl mx-auto p-6 pt-10">
+<!-- TOAST -->
+{#if showToast}
+  <div
+    class={`
+      fixed z-50 flex items-center gap-2 px-5 py-3 rounded-xl shadow-lg
+      text-sm font-medium transition-all duration-300
 
-    {#if successMessage}
-      <div
-        transition:fade
-        class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-sm"
-      >
-        {successMessage}
-      </div>
+      ${toastType === "success"
+        ? "bg-green-600 text-white"
+        : "bg-red-600 text-white"}
+
+      ${toastPosition === "top-left"
+        ? "top-5 left-5"
+        : ""}
+
+      ${toastPosition === "top-center"
+        ? "top-5 left-1/2 -translate-x-1/2"
+        : ""}
+
+      ${toastPosition === "top-right"
+        ? "top-5 right-5"
+        : ""}
+
+      ${toastPosition === "bottom-left"
+        ? "bottom-5 left-5"
+        : ""}
+
+      ${toastPosition === "bottom-center"
+        ? "bottom-5 left-1/2 -translate-x-1/2"
+        : ""}
+
+      ${toastPosition === "bottom-right"
+        ? "bottom-5 right-5"
+        : ""}
+    `}
+  >
+    <!-- ICON -->
+    {#if toastType === "success"}
+      <BadgeCheck class="w-5 h-5 text-white" />
+    {:else}
+      <BadgeAlert class="w-5 h-5 text-white" />
     {/if}
 
+    <!-- MESSAGE -->
+    <span>{toastMessage}</span>
+  </div>
+{/if}
+
+  <div class="bg-white border border-gray-300 shadow-xl rounded-2xl p-8 space-y-8">
+    <h2 class="text-2xl font-bold text-gray-900">Edit Profile</h2>
+
     <form on:submit|preventDefault={handleSubmit} class="flex flex-col md:flex-row gap-10">
-      <!-- Profile Image & Upload -->
+      <!-- PROFILE IMAGE UPLOAD -->
       <div class="flex flex-col items-center space-y-4 flex-shrink-0">
         <img
           src={profilePic}
@@ -137,12 +205,11 @@
         />
       </div>
 
-      <!-- Form Fields -->
+      <!-- FORM FIELDS -->
       <div class="flex flex-col flex-1 space-y-6">
         <div>
-          <label for="name" class="block font-semibold text-gray-700 mb-1">Username</label>
+          <label class="block font-semibold text-gray-700 mb-1">Username</label>
           <input
-            id="name"
             type="text"
             bind:value={username}
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -150,28 +217,26 @@
         </div>
 
         <div>
-          <label for="password" class="block font-semibold text-gray-700 mb-1">New Password</label>
+          <label class="block font-semibold text-gray-700 mb-1">New Password</label>
           <input
-            id="password"
             type="password"
-            placeholder="Enter new password"
             bind:value={password}
+            placeholder="Enter new password"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label for="confirm-password" class="block font-semibold text-gray-700 mb-1">Confirm Password</label>
+          <label class="block font-semibold text-gray-700 mb-1">Confirm Password</label>
           <input
-            id="confirm-password"
             type="password"
-            placeholder="Confirm password"
             bind:value={confirmPassword}
+            placeholder="Confirm password"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
-        <!-- Buttons -->
+        <!-- BUTTON -->
         <div class="flex flex-col md:flex-row gap-3 pt-6">
           <button
             type="submit"
@@ -190,3 +255,5 @@
     </form>
   </div>
 </section>
+<Footer />
+<Contact />

@@ -1,589 +1,408 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { page } from '$app/stores';
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import Footer from "$lib/user/footer.svelte";
+  import Contact from "$lib/user/contact.svelte";
+  import {
+    Clock, 
+    Search, 
+    Plus, 
+    X,
+    BadgeCheck,
+    BadgeAlert,
+    TriangleAlert,
+    CircleX,
+    Loader
+  } from "lucide-svelte";
+
+  let toastMessage = "";
+  let showToast = false;
+  let toastType: "success" | "error" = "success";
+  let toastPosition:
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right" = "top-right";
 
   interface Recipe {
     id: string;
     title?: string;
     image: string;
+    description: string;
+    difficulty: string;
+    estimatedTime: string;
     ingredients: string[];
     steps?: string[];
     category?: string;
-    saved: boolean;
+    saved?: boolean;
   }
 
-  let topAIRecipes: Recipe[] = [];
-  let otherAIRecipes: Recipe[] = []; 
-  let remainingRecipes: Recipe[] = [];
-  let showModal = false;
-  let selectedRecipe: Recipe | null = null;
-  let isLoading = false;
-  let searchTerm = '';
-  let recipes: Recipe[] = [];
-  let selectedCategory = 'All';
-  let currentPage = 1;
-  const itemsPerPage = 9;
+  // Ingredient input + list
+  let ingredientText = "";
+  let ingredientList: string[] = [];
 
-  // Modal for ingredient search
-  let showSearchModal = false;
-  let ingredientsInput = "";
+  // Results
+  let recipes: Recipe[] = [];
+  let topAIRecipes: Recipe[] = [];
+  let otherAIRecipes: Recipe[] = [];
+  let remainingRecipes: Recipe[] = [];
+
+  // UI state
+  let isLoading = false;
   let hasSearched = false;
 
-  const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Dessert'];
-  
-  let unsubscribe: () => void;
+  function triggerToast(message: string, 
+        type: "success" | "error" = "success", 
+        position: typeof toastPosition = "top-right") {
+    toastMessage = message;
+    toastType = type;
+    showToast = true;
+    toastPosition = position;
+    
+    setTimeout(() => (showToast = false), 3000);
+  }
 
   onMount(() => {
-    fetchRecipes();
-    window.addEventListener("keydown", handleKeydown);
-    unsubscribe = page.subscribe(($page) => {
-      searchTerm = $page.url.searchParams.get('search')?.toLowerCase() || '';
-      fetchRecipes();
-    });
   });
 
-  onDestroy(() => {
-    unsubscribe?.();
-    window.removeEventListener("keydown", handleKeydown);
-  });
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === "Escape") {
-      if (showModal) closeModal();
-      if (showSearchModal) closeSearchModal();
-    }
+  function addIngredient() {
+    const trimmed = ingredientText.trim().toLowerCase();
+    if (!trimmed) return;
+    if (!ingredientList.includes(trimmed)) ingredientList = [...ingredientList, trimmed];
+    ingredientText = "";
   }
 
-  async function toggleSave(id: string, saved: boolean) {
-    try {
-      const url = saved
-        ? 'https://airecipe-backend-2.onrender.com/api/unsave'
-        : 'https://airecipe-backend-2.onrender.com/api/save';
+  function removeIngredient(ing: string) {
+    ingredientList = ingredientList.filter(i => i !== ing);
+  }
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ recipeId: id })
+  async function searchByIngredientList() {
+    if (ingredientList.length === 0) {
+      triggerToast("Add at least 1 ingredient.", "error", "top-center");
+      return;
+    }
+
+    isLoading = true;
+    hasSearched = true;
+    recipes = [];
+    topAIRecipes = [];
+    otherAIRecipes = [];
+    remainingRecipes = [];
+
+    try {
+      const query = ingredientList.join(",");
+      const res = await fetch(`http://localhost:3000/api/recipe/search?ingredient=${encodeURIComponent(query)}`, {
+        credentials: "include",
       });
 
-      if (res.ok) {
-        recipes = recipes.map(r =>
-          r.id === id ? { ...r, saved: !saved } : r
-        );
-        topAIRecipes = topAIRecipes.map(r =>
-        r.id === id ? { ...r, saved: !saved } : r
-      );
-
-      // update in otherAIRecipes
-      otherAIRecipes = otherAIRecipes.map(r =>
-        r.id === id ? { ...r, saved: !saved } : r
-      );
-
-      // update in remainingRecipes if needed
-      remainingRecipes = remainingRecipes.map(r =>
-        r.id === id ? { ...r, saved: !saved } : r
-      );
-
-      // also update modal if it's open
-      if (selectedRecipe && selectedRecipe.id === id) {
-        selectedRecipe = { ...selectedRecipe, saved: !saved };
+      // handle auth/guest responses gracefully
+      if (res.status === 403) {
+        const err = await res.json();
+        triggerToast(err.message || "Guest search limit reached. Please sign in.", "error", "top-center");
+        isLoading = false;
+        return;
       }
-    }
-    } catch (err) {
-      console.error(err);
-    }
-  }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        triggerToast(err.message || "Search failed.", "error", "top-center");
+        isLoading = false;
+        return;
+      }
 
-  async function fetchRecipes() {
-    isLoading = true;
-    try {
-      const allRes = await fetch('https://airecipe-backend-2.onrender.com/api/recipe/all', { credentials: 'include' });
-      const allData = await allRes.json();
-      let list = allData.results || allData.recipes || [];
+      const data = await res.json();
+      const list = data.results || [];
 
-      const savedRes = await fetch('https://airecipe-backend-2.onrender.com/api/saved/', { credentials: 'include' });
-      const savedData = await savedRes.json();
-      const savedIds = (savedData.results || []).map((r: any) => r._id.toString());
-
+      // Build local recipe objects
       recipes = list.map((r: any) => ({
-        id: r._id.toString(),
+        id: (r._id || r.id).toString(),
         title: r.title,
         image: r.image,
+        description: r.description,
+        difficulty: r.difficulty,
+        estimatedTime: r.estimatedTime,
         ingredients: r.ingredients || [],
         category: r.category,
         steps: r.steps || [],
-        saved: savedIds.includes(r._id.toString()),
+        saved: !!r.saved
       }));
+
+      // Split results: top 3 + next 3 (least relevant) + rest
+      topAIRecipes = recipes.slice(0, 3);
+      otherAIRecipes = recipes.slice(3, 6);
+      remainingRecipes = recipes.slice(6);
     } catch (err) {
-      console.error('Failed to fetch recipes:', err);
-      recipes = [];
+      console.error("Search error:", err);
+      triggerToast("Network error while searching recipes.");
     } finally {
       isLoading = false;
     }
   }
 
-  async function fetchRecipeById(id: string) {
-    try {
-      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/${id}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch recipe');
-      const data = await res.json();
-      return data.results;
-    } catch (err) {
-      console.error('Failed to fetch recipe: ', err);
-    }
+  function openRecipePage(id: string) {
+     goto(`/user/recipe/${id}`);
   }
 
-  async function openRecipeModal(id: string) {
-    const recipe = await fetchRecipeById(id);
-    if (recipe) {
-      selectedRecipe = recipe;
-      showModal = true;
-    }
-  }
-
-  function closeModal() {
-    showModal = false;
-    selectedRecipe = null;
-  }
-
-  function openSearchModal() {
-    showSearchModal = true;
-  }
-
-  function closeSearchModal() {
-    showSearchModal = false;
-    ingredientsInput = "";
-  }
-
-  async function handleIngredientSearch() {
-  hasSearched = true;
-  showSearchModal = false;
-  isLoading = true;
-  currentPage = 1;
-
-  try {
-    const res = await fetch(
-      `https://airecipe-backend-2.onrender.com/api/recipe/search?ingredient=${encodeURIComponent(ingredientsInput)}`,
-      { credentials: 'include' }
-    );
-
-    if (!res.ok) {
-      const errData = await res.json();
-      console.error("AI search error:", errData);
-      recipes = [];
-      return;
-    }
-
-    const data = await res.json();
-    const list = data.results || [];
-
-    let savedIds: string[] = [];
-
-    // Try to fetch saved recipes (ignore if user not logged in)
-    try {
-      const savedRes = await fetch("https://airecipe-backend-2.onrender.com/api/saved", {
-        credentials: "include",
-      });
-
-      if (savedRes.ok) {
-        const savedData = await savedRes.json();
-        savedIds = (savedData.results || []).map((r: any) => r._id.toString());
-      } else {
-        console.warn("Not logged in or failed to fetch saved recipes");
-      }
-    } catch (err) {
-      console.warn("Skipping saved recipes fetch:", err);
-    }
-
-    // Build recipe objects
-    recipes = list.map((r: any) => ({
-      id: r._id?.toString() || r.id,
-      title: r.title,
-      image: r.image,
-      ingredients: r.ingredients || [],
-      category: r.category,
-      steps: r.steps || [],
-      saved: savedIds.includes(r._id?.toString() || r.id),
-    }));
-
-    // Split into groups for UI
-    topAIRecipes = recipes.slice(0, 3);
-    otherAIRecipes = recipes.length > 3 ? recipes.slice(3, 6) : [];
-    remainingRecipes = recipes.slice(6);
-  } catch (err) {
-    console.error("Failed to fetch AI search recipes:", err);
-    recipes = [];
-  } finally {
-    isLoading = false;
-    ingredientsInput = "";
+  function difficultyColor(level: string) {
+  switch (level.toLowerCase()) {
+    case "easy":
+      return "bg-green-100 text-green-700";
+    case "medium":
+      return "bg-yellow-100 text-yellow-700";
+    case "hard":
+      return "bg-red-100 text-red-700";
+    default:
+      return "bg-gray-100 text-gray-700";
   }
 }
-
-  // Filtering
-  const recentCount = 3;
-  $: recentRecipes = recipes.slice(-recentCount);
-
-  $: allFilteredRecipes = recipes.filter(recipe => {
-    const matchesCategory =
-      selectedCategory === 'All' ||
-      (selectedCategory === 'Recent Searches' && recentRecipes.includes(recipe)) ||
-      recipe.category === selectedCategory;
-
-    const matchesSearch =
-      !searchTerm ||
-      recipe.title?.toLowerCase().includes(searchTerm) ||
-      recipe.ingredients.some(i => i.toLowerCase().includes(searchTerm));
-    return matchesCategory && matchesSearch;
-  });
-
-  $: totalPages = Math.ceil(allFilteredRecipes.length / itemsPerPage);
-  $: paginatedRecipes = allFilteredRecipes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  function goToNextPage() {
-    if (currentPage < totalPages) currentPage++;
-  }
-  function goToPrevPage() {
-    if (currentPage > 1) currentPage--;
-  }
 </script>
 
-<section class="max-w-7xl mx-auto px-4 py-8">
+<section class="max-w-6xl mx-auto px-4 py-20 min-h-[85vh]">
+<!-- TOAST -->
+{#if showToast}
+  <div
+    class={`
+      fixed z-50 flex items-center gap-2 px-5 py-3 rounded-xl shadow-lg
+      text-sm font-medium transition-all duration-300
 
-  <!-- Search Button -->
-<div class="flex justify-center mb-6">
-  <button
-    class="btn relative overflow-hidden flex items-center gap-2 px-8 py-3 
-           border-2 border-[#228B22] 
-           text-black font-semibold rounded-full 
-           shadow-md transition-all duration-500 
-           hover:scale-105 hover:shadow-lg active:scale-95"
-    on:click={openSearchModal}
+      ${toastType === "success"
+        ? "bg-green-600 text-white"
+        : "bg-red-600 text-white"}
+
+      ${toastPosition === "top-left"
+        ? "top-5 left-5"
+        : ""}
+
+      ${toastPosition === "top-center"
+        ? "top-5 left-1/2 -translate-x-1/2"
+        : ""}
+
+      ${toastPosition === "top-right"
+        ? "top-5 right-5"
+        : ""}
+
+      ${toastPosition === "bottom-left"
+        ? "bottom-5 left-5"
+        : ""}
+
+      ${toastPosition === "bottom-center"
+        ? "bottom-5 left-1/2 -translate-x-1/2"
+        : ""}
+
+      ${toastPosition === "bottom-right"
+        ? "bottom-5 right-5"
+        : ""}
+    `}
   >
-    <!-- Icon + Text -->
-    <span class="text-lg *:relative z-10 transition-transform duration-500 group-hover:rotate-22">
-      🍳
-    </span>
-    <span class="text-lg relative z-10">Turn Ingredients into Recipes</span>
-  </button>
+    <!-- ICON -->
+    {#if toastType === "success"}
+      <BadgeCheck class="w-5 h-5 text-white" />
+    {:else}
+      <BadgeAlert class="w-5 h-5 text-white" />
+    {/if}
+
+    <!-- MESSAGE -->
+    <span>{toastMessage}</span>
+  </div>
+{/if}
+
+      <h1 class="text-4xl md:text-5xl text-[#000000] text-center mb-5">Find your perfect Recipe</h1>
+      <p class="text-gray-600 text-lg text-center mx-w-2xl mx-auto mb-10">Enter the ingredients you have and discover what you can make</p>
+
+ <!-- SEARCH BOX CONTAINER -->
+<div class="max-w-2xl mx-auto mb-6">
+  <div class="bg-white border border-gray-300 p-6 rounded-2xl shadow-lg">
+
+    <!-- SEARCH AND ADD BUTTON -->
+    <div class="flex gap-2">
+      <input
+        class="bg-gray-200 flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400"
+        placeholder="Enter an ingredient (e.g. chicken, tomatoes, pasta)"
+        bind:value={ingredientText}
+        on:keydown={(e) => e.key === "Enter" && addIngredient()}
+      />
+
+      <button 
+        class="px-4 py-2 flex items-center gap-2 bg-[#228B22] text-white 
+               rounded-lg hover:bg-[#1a5f17] hover:scale-[1.03] transition"
+        on:click={addIngredient}
+      > 
+        <Plus size="14" class="text-white" />
+        <span>Add</span>
+      </button>
+    </div>
+
+    <!-- INGREDIENT SECTION -->
+    {#if ingredientList.length > 0}
+      <p class="mt-3 mb-2 text-md text-gray-700">Your ingredients:</p>
+
+    <!-- INGREDIENT TAGS -->
+    <div class="flex flex-wrap gap-2 mt-2">
+      {#each ingredientList as ing}
+        <div class="flex items-center gap-2 bg-gray-200 font-semibold text-[#000000] px-3 py-1 rounded-lg">
+          <span class="capitalize">{ing}</span>
+          <button class="text-gray-500 hover:text-red-700" on:click={() => removeIngredient(ing)}>
+            <X size="14" />
+          </button>
+        </div>
+      {/each}
+    </div>
+    {/if}
+
+<!-- SEARCH BUTTON -->
+<button
+  class="w-full mt-4 py-3 bg-black text-white rounded-lg
+         flex items-center justify-center gap-2
+         hover:bg-gray-800 hover:scale-[1.03] transition
+         disabled:opacity-70 disabled:cursor-not-allowed"
+  on:click={searchByIngredientList}
+  disabled={isLoading}
+>
+  {#if isLoading}
+  <!-- SPINNER -->
+  <Loader
+    class="w-5 h-5 animate-spin text-white"
+    aria-label="Loading"
+  />
+
+  <span>Searching...</span>
+  {:else}
+    <Search size="18" class="text-white" />
+    <span>Search Recipes</span>
+  {/if}
+</button>
+
+</div>
 </div>
 
-  <!-- Ingredient Search Modal -->
-  {#if showSearchModal}
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-fadeIn relative">
-        <button
-          class="absolute top-3 right-3 text-gray-700
-                   w-9 h-9 rounded-full bg-white/80  
-                   shadow-md hover:bg-red-500 hover:text-white 
-                   transition-all duration-200 ease-in-out 
-                   hover:scale-110 active:scale-95"
-          on:click={closeSearchModal}
-        >
-          ✖
-        </button>
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Search Recipes by Ingredients</h2>
-        <p class="text-sm text-gray-600 mb-3">Enter the ingredients you have (comma separated):</p>
-        <input
-          type="text"
-          bind:value={ingredientsInput}
-          placeholder="e.g. chicken, garlic, onion"
-          class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#228B22] mb-4"
-          on:keydown={(e) => {
-            if (e.key === "Enter" && ingredientsInput.trim()) {
-              e.preventDefault();
-              handleIngredientSearch();
-            }
-          }}
-        />
-        <div class="flex justify-end gap-3">
-          <button
-            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-            on:click={closeSearchModal}
-          >
-            Cancel
-          </button>
-          <button
-            class="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-[#1a5f17] transition"
-            on:click={handleIngredientSearch}
-            disabled={!ingredientsInput.trim()}
-          >
-            Search
-          </button>
-        </div>
-      </div>
-    </div>
-  {/if}
+<!-- RESULTS / STATES -->
+{#if hasSearched && !isLoading && recipes.length === 0}
 
-  <!-- Main Content -->
-  {#if isLoading}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    {#each Array(6) as _}
-      <div class="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-        <div class="bg-gray-300 h-48 w-full"></div>
-        <div class="p-4 space-y-3">
-          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
-          <div class="h-4 bg-gray-300 rounded w-1/2"></div>
-        </div>
-      </div>
-    {/each}
-  </div>
-    {:else if !hasSearched}
-  <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-    <span class="text-7xl animate-bounce">🍽️</span>
-    <p class="text-gray-600 text-lg font-semibold">I’m hungry... feed me some ingredients!</p>
-  </div>
-
-{:else if paginatedRecipes.length === 0}
-  <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-    <!-- Shaking Head Emoji -->
-    <span 
-      class="text-7xl animate-shake"
-    >
-      😩
-    </span>
-
-    <!-- Message -->
-    <p class="text-red-600 text-lg font-semibold">
+  <!-- EMPTY STATE -->
+  <div class="flex flex-col items-center justify-center min-h-[40vh] space-y-4 text-center">
+    <div class="text-6xl">😩</div>
+    <div class="text-red-600 font-semibold text-lg">
       No recipes match your ingredients.
-    </p>
-
-    <!-- Suggestion -->
-    <p class="text-gray-500 text-lg">
+    </div>
+    <div class="text-gray-500">
       Try adding or changing your ingredients 🍅🥦🍗
-    </p>
+    </div>
   </div>
+
 {:else}
 
+  <!-- TOP AI RECOMMENDATIONS -->
+  {#if topAIRecipes.length > 0}
+    <h3 class="text-2xl font-bold text-gray-800 mb-3">
+      Top AI Recommendations
+    </h3>
 
-  <!-- AI Recommendations -->
-{#if topAIRecipes.length > 0}
-  <h3 class="text-2xl font-bold text-gray-800 mb-4">Top AI Recommended Recipes</h3>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-    {#each topAIRecipes as recipe}
-      <div
-        class="bg-white rounded-xl shadow-md overflow-hidden transform transition hover:scale-[1.02] hover:shadow-lg cursor-pointer"
-        on:click={() => openRecipeModal(recipe.id)}
-      >
-        <!-- Image + Category Badge -->
-        <div class="relative">
-          <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
-          {#if recipe.category}
-            <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-              {recipe.category}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      {#each topAIRecipes as r}
+        <div
+          class="bg-white border border-gray-300 rounded-2xl shadow-md
+                 overflow-hidden hover:scale-[1.03] transition cursor-pointer
+                 w-full max-w-sm mx-auto"
+          on:click={() => openRecipePage(r.id)}
+        >
+          <!-- IMAGE -->
+          <img src={r.image} class="w-full h-64 object-cover" />
+
+          <div class="p-5">
+            <!-- BADGES -->
+            <div class="flex gap-2 mb-3">
+              <span class="px-3 py-1 text-xs rounded-md bg-[#ececec] text-[#000000]">
+                {r.category}
+              </span>
+
+              <span class={`px-3 py-1 text-xs rounded-md ${difficultyColor(r.difficulty)}`}>
+                {r.difficulty}
+              </span>
             </div>
-          {/if}
-        </div>
 
-        <!-- Title -->
-        <div class="p-4">
-          <h2 class="text-lg font-semibold text-gray-800">{recipe.title}</h2>
-        </div>
+            <!-- TITLE -->
+            <h3 class="text-xl text-[#000000] font-semibold mb-1">
+              {r.title}
+            </h3>
 
-        <!-- Save Button -->
-        <div class="px-4 pb-4 flex justify-end items-center">
-          <button
-            type="button"
-            class="flex items-center justify-center w-9 h-9 rounded-full 
-              transition-all duration-200 ease-in-out 
-              shadow-md hover:scale-110 active:scale-95
-                {recipe.saved 
-                ? 'bg-red-500 text-white hover:bg-red-500' 
-                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}"
-              on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
-               aria-label={recipe.saved ? "Remove Bookmark" : "Bookmark Recipe"}
-            >
-    {#if recipe.saved}
-      <!-- Solid Bookmark (Saved) -->
-      <i class="fa-solid fa-bookmark text-lg"></i>
-    {:else}
-      <!-- Regular Bookmark (Not Saved) -->
-      <i class="fa-regular fa-bookmark text-lg"></i>
-    {/if}
-  </button>
-</div>
+            <!-- DESCRIPTION -->
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+              {r.description}
+            </p>
 
-      </div>
-    {/each}
-  </div>
-{/if}
-
-
-  <!-- Least AI Recommended -->
-  {#if otherAIRecipes.length > 0}
-  <h3 class="text-xl font-semibold text-gray-600 mb-4">Least Relevant Recipes</h3>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-    {#each otherAIRecipes as recipe}
-      <div
-        class="bg-gray-50 rounded-xl shadow-sm overflow-hidden border border-gray-200 transform transition hover:scale-[1.01] cursor-pointer"
-        on:click={() => openRecipeModal(recipe.id)}
-      >
-        <!-- Image + Category Badge -->
-        <div class="relative">
-          <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover"/>
-          {#if recipe.category}
-            <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-              {recipe.category}
+            <!-- ESTIMATED TIME -->
+            <div class="flex items-center text-gray-500 text-sm gap-1">
+              <Clock size="14" />
+              <span>{r.estimatedTime}</span>
             </div>
-          {/if}
-        </div>
-
-        <!-- Title -->
-        <div class="p-4">
-          <h2 class="text-md font-medium text-gray-700">{recipe.title}</h2>
-        </div>
-
-        <!-- Save Button -->
-        <div class="px-4 pb-4 flex justify-end items-center">
-          <button
-            type="button"
-            class="flex items-center justify-center w-9 h-9 rounded-full 
-              transition-all duration-200 ease-in-out 
-              shadow-md hover:scale-110 active:scale-95
-                {recipe.saved 
-                ? 'bg-red-500 text-white hover:bg-red-500' 
-                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}"
-              on:click|stopPropagation={() => toggleSave(recipe.id, recipe.saved)}
-               aria-label={recipe.saved ? "Remove Bookmark" : "Bookmark Recipe"}
-            >
-    {#if recipe.saved}
-      <!-- Solid Bookmark (Saved) -->
-      <i class="fa-solid fa-bookmark text-lg"></i>
-    {:else}
-      <!-- Regular Bookmark (Not Saved) -->
-      <i class="fa-regular fa-bookmark text-lg"></i>
-    {/if}
-  </button>
-</div>
-
-      </div>
-    {/each}
-  </div>
-{/if}
-  {/if}
-
-  <!-- Recipe Details Modal -->
-  {#if showModal && selectedRecipe}
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" on:click={closeModal}>
-      <div
-        class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fadeIn relative"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="recipe-title"
-        on:click|stopPropagation
-      >
-        <!-- Image + Title -->
-        <div class="relative">
-          <img src={selectedRecipe.image} alt={selectedRecipe.title} class="w-full h-64 object-cover"/>
-          <button
-            type="button"
-            class="absolute top-3 right-3 z-10 flex items-center justify-center 
-                   w-9 h-9 rounded-full bg-white/80 text-gray-700 
-                   shadow-md hover:bg-red-500 hover:text-white 
-                   transition-all duration-200 ease-in-out 
-                   hover:scale-110 active:scale-95"
-            on:click={closeModal}
-            aria-label="Close modal"
-          >
-            ✖
-          </button>
-          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-            <h2 id="recipe-title" class="text-2xl font-bold text-white drop-shadow-md">{selectedRecipe.title}</h2>
           </div>
         </div>
-
-        <!-- Details -->
-        <div class="p-6 max-h-[65vh] overflow-y-auto">
-          {#if selectedRecipe.category}
-            <p class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mb-4">{selectedRecipe.category}</p>
-          {/if}
-
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">Ingredients</h3>
-          <ul class="list-disc list-inside text-gray-700 mb-6 space-y-1">
-            {#each selectedRecipe.ingredients as ing}
-              <li>{ing}</li>
-            {/each}
-          </ul>
-
-          {#if selectedRecipe.steps && selectedRecipe.steps.length > 0}
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Steps</h3>
-            <p class="text-gray-700 whitespace-pre-line leading-relaxed mb-6">
-              {selectedRecipe.steps.join('\n\n')}
-            </p>
-          {/if}
-        </div>
-      </div>
+      {/each}
     </div>
   {/if}
+
+  <!-- LEAST RELEVANT AI RECOMMENDATIONS -->
+  {#if otherAIRecipes.length > 0}
+    <h3 class="text-xl font-semibold text-gray-700 mb-3">
+      Less Relevant AI Recommendations
+    </h3>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      {#each otherAIRecipes as r}
+        <div
+          class="bg-white border border-gray-300 rounded-2xl shadow-md
+                 overflow-hidden hover:scale-[1.03] transition cursor-pointer
+                 w-full max-w-sm mx-auto"
+          on:click={() => openRecipePage(r.id)}
+        >
+          <!-- IMAGE -->
+          <img src={r.image} class="w-full h-64 object-cover" />
+
+          <div class="p-5">
+            <!-- BADGES -->
+            <div class="flex gap-2 mb-3">
+              <span class="px-3 py-1 text-xs rounded-md bg-[#ececec] text-[#000000]">
+                {r.category}
+              </span>
+
+              <span class={`px-3 py-1 text-xs rounded-md ${difficultyColor(r.difficulty)}`}>
+                {r.difficulty}
+              </span>
+            </div>
+
+            <!-- TITLE -->
+            <h3 class="text-xl text-[#000000] font-semibold mb-1">
+              {r.title}
+            </h3>
+
+            <!-- DESCRIPTION -->
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+              {r.description}
+            </p>
+
+            <!-- ESTIMATED TME -->
+            <div class="flex items-center text-gray-500 text-sm gap-1">
+              <Clock size="14" />
+              <span>{r.estimatedTime}</span>
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
+  {/if}
+{/if}
+
 </section>
 
+<Contact />
+<Footer />
+
 <style>
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
-  .animate-fadeIn {
-    animation: fadeIn 0.25s ease-out;
-  }
-  .btn {
-  background: #ffffff;
-  position: relative;
-  z-index: 0;
-  overflow: hidden;
-}
-.btn::before,
-.btn::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  left: -50%;
-  right: -50%;
-  height: 0;
-  padding-bottom: 200%;
-  border-radius: 39%;
-  opacity: 0;
-  transition: transform 0s cubic-bezier(0.2, 0, 0.1, 1) 0.5s, opacity 0.5s cubic-bezier(0.2, 0, 0.1, 1);
-}
-.btn::before {
-  transform: translate3d(-10%, 4.8em, 0) rotate(330deg);
-  background: linear-gradient(
-    25deg,
-    rgba(34, 139, 34, 0.4),
-    rgba(34, 139, 34, 0)
-  );
-}
-.btn::after {
-  transform: translate3d(10%, 4.8em, 0) rotate(0deg);
-  background: linear-gradient(
-    70deg,
-    rgba(34, 139, 34, 0.4),
-    rgba(34, 139, 34, 0)
-  );
-}
-.btn:hover::before,
-.btn:hover::after {
-  transition: transform 2s ease 0s, opacity 0.2s ease;
-  opacity: 1;
-}
-.btn:hover::before {
-  transform: translate3d(-10%, -1em, 0) rotate(100deg);
-}
-.btn:hover::after {
-  transform: translate3d(10%, -1em, 0) rotate(180deg);
-}
-@keyframes shake {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-8px) rotate(-8deg); }
-  40% { transform: translateX(8px) rotate(8deg); }
-  60% { transform: translateX(-6px) rotate(-6deg); }
-  80% { transform: translateX(6px) rotate(6deg); }
-  100% { transform: translateX(0); }
-}
-
-.animate-shake {
-  display: inline-block;
-  animation: shake 0.6s ease-in-out infinite;
-}
-
 </style>

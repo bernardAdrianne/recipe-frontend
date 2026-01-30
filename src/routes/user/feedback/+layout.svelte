@@ -1,21 +1,19 @@
 <script>
     import { page } from '$app/stores';
     import { derived } from "svelte/store";
-    import NavBar from "$lib/user/navbar.svelte";
     import Footer from "$lib/user/footer.svelte";
     import Contact from "$lib/user/contact.svelte";
     
-    const isHome = derived(page, $page => $page.url.pathname === "/user/home");
+    const isSaved = derived(page, $page => $page.url.pathname === "/user/feedback");
 </script>
 
-<div class="bg-[#F4F6F6] flex flex-col min-h-screen">
-    <NavBar />
+<div class="flex flex-col min-h-screen">
 
     <main class="flex-grow">
         <slot />
     </main>
 
-    {#if $isHome}
+    {#if $isSaved}
       <div class="flex flex-col">
         <Contact />
         <Footer />

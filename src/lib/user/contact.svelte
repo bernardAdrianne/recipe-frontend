@@ -6,9 +6,9 @@
   }
 </script>
 
-<footer class="bg-[#F9FAFB] text-[#444444] py-10 mt-12 shadow-inner relative">
+<footer class="bg-[#F9FAFB] text-[#444444] py-10 shadow-inner relative">
   <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
-    <!-- Branding -->
+    <!-- BRANDING -->
     <div>
       <h1 class="text-3xl font-bold text-[#222222] mb-3">ReciPinoy</h1>
       <p class="text-sm text-gray-500 leading-relaxed">
@@ -17,7 +17,7 @@
       </p>
     </div>
 
-    <!-- Navigation -->
+    <!-- NAVIGATION -->
     <div>
       <h2 class="text-lg font-semibold text-[#222222] mb-3">Quick Links</h2>
       <ul class="space-y-2 text-sm">
@@ -28,7 +28,7 @@
       </ul>
     </div>
 
-    <!-- Support -->
+    <!-- SUPPORT -->
     <div>
       <h2 class="text-lg font-semibold text-[#222222] mb-3">Support</h2>
       <ul class="space-y-2 text-sm">
@@ -38,7 +38,7 @@
       </ul>
     </div>
 
-    <!-- Social & Back to top -->
+    <!-- SOCIAL AND BACK TO TOP -->
     <div class="flex flex-col items-start md:items-end space-y-4">
       <div class="flex space-x-3">
         <a href="/facebook" aria-label="Facebook"
@@ -63,7 +63,7 @@
     </div>
   </div>
 
-  <!-- Divider & Bottom note -->
+  <!--DIVIDER & BOTTTOM NOTE -->
   <div class="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-gray-500">
     © {new Date().getFullYear()} ReciPinoy. All rights reserved.
   </div>

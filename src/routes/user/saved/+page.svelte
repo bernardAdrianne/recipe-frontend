@@ -1,22 +1,50 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from "$app/navigation";
   import { fade } from 'svelte/transition';
-
-  let showModal = false;
-  let selectedRecipe: any = null;
-  let message = '';
+  import { 
+    Clock, 
+    Bookmark, 
+    Trash2,
+    CircleX,
+    BadgeCheck,
+    BadgeAlert
+  } 
+  from "lucide-svelte";
+  
   let recipes: any[] = [];
   let currentPage = 1;
-  const itemsPerPage = 9;
+  const itemsPerPage = 6;
+  
+  let toastMessage = "";
+  let showToast = false;
+  let toastType: "success" | "error" = "success";
+  let toastPosition:
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right" = "top-right";
 
   onMount(() => {
     fetchSavedRecipes();
   });
 
-  
+  function triggerToast(message: string, 
+        type: "success" | "error" = "success", 
+        position: typeof toastPosition = "top-right") {
+    toastMessage = message;
+    toastType = type;
+    showToast = true;
+    toastPosition = position;
+    
+    setTimeout(() => (showToast = false), 3000);
+  }
+
   async function toggleUnsave(id: string) {
     try {
-      const res = await fetch('https://airecipe-backend-2.onrender.com/api/unsave', {
+      const res = await fetch('http://localhost:3000/api/unsave', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -29,13 +57,7 @@
 
       recipes = recipes.filter(r => r._id !== id);
 
-      // close modal if current recipe was unsaved
-      if (selectedRecipe && selectedRecipe._id === id) {
-        closeModal();
-      }
-
-      message = 'Recipe unsaved successfully';
-      setTimeout(() => (message = ''), 2000);
+      triggerToast("Recipe removed successfully", "success", "top-right");
     } catch (err) {
       console.error(err);
     }
@@ -43,7 +65,7 @@
 
   async function fetchSavedRecipes() {
     try {
-      const res = await fetch('https://airecipe-backend-2.onrender.com/api/saved', {
+      const res = await fetch('http://localhost:3000/api/saved', {
         method: 'GET',
         credentials: 'include',
       });
@@ -60,34 +82,17 @@
     }
   }
 
-  async function fetchRecipeById(id: string) {
-    try {
-      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/${id}`, {
-        credentials: 'include'
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch recipe');
-      }
-
-      const data = await res.json();
-      return data.results;
-    } catch (err) {
-      console.error('Fetch recipe error:', err);
+  function difficultyColor(level: string) {
+  switch (level?.toLowerCase()) {
+    case "easy": return "bg-green-100 text-green-700";
+    case "medium": return "bg-yellow-100 text-yellow-700";
+    case "hard": return "bg-red-100 text-red-700";
+    default: return "bg-gray-100 text-gray-700";
     }
   }
 
-  async function openRecipeModal(id: string) {
-    const recipe = await fetchRecipeById(id);
-    if (recipe) {
-      selectedRecipe = recipe;
-      showModal = true;
-    }
-  }
-
-  function closeModal() {
-    showModal = false;
-    selectedRecipe = null;
+  function openRecipePage(id: string) {
+     goto(`/user/recipe/${id}`);
   }
 
   $: savedRecipes = recipes;
@@ -104,159 +109,171 @@
 
   $: if (currentPage > totalPages) currentPage = totalPages || 1;
 
-
 </script>
 
-<!-- Saved Recipes Dashboard -->
+<!-- SAVED RECIPES DASHBOARD -->
 <section class="max-w-7xl mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold text-center mb-6">My Bookmarks</h1>
+{#if showToast}
+  <div
+    class={`
+      fixed z-50 flex items-center gap-2 px-5 py-3 rounded-xl shadow-lg
+      text-sm font-medium transition-all duration-300
 
-  {#if message}
-    <p
-      transition:fade
-      class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-3 rounded-xl shadow-lg z-50"
-    >
-      {message}
-    </p>
-  {/if}
+      ${toastType === "success"
+        ? "bg-green-600 text-white"
+        : "bg-red-600 text-white"}
+
+      ${toastPosition === "top-left"
+        ? "top-5 left-5"
+        : ""}
+
+      ${toastPosition === "top-center"
+        ? "top-5 left-1/2 -translate-x-1/2"
+        : ""}
+
+      ${toastPosition === "top-right"
+        ? "top-5 right-5"
+        : ""}
+
+      ${toastPosition === "bottom-left"
+        ? "bottom-5 left-5"
+        : ""}
+
+      ${toastPosition === "bottom-center"
+        ? "bottom-5 left-1/2 -translate-x-1/2"
+        : ""}
+
+      ${toastPosition === "bottom-right"
+        ? "bottom-5 right-5"
+        : ""}
+    `}
+  >
+    <!-- ICON -->
+    {#if toastType === "success"}
+      <BadgeAlert class="w-5 h-5 text-white" />
+    {:else}
+      <BadgeAlert class="w-5 h-5 text-white" />
+    {/if}
+
+    <!-- MESSAGE -->
+    <span>{toastMessage}</span>
+  </div>
+{/if}
+
+  <div class="flex mt-6 gap-2">
+    <Bookmark size="42" class="text-black-700 bg-green-200 rounded-full p-2"/>
+    <h1 class="text-4xl text-[#000000] mb-6">My Bookmarks</h1>
+  </div>
+
+    <p class="text-2xl text-gray-600">You saved recipes for quick access</p>
 
 {#if savedRecipes.length === 0}
-  <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center">
-    <span class="text-7xl animate-bounce">🥣</span>
+  <div class="flex flex-col bg-white border border-gray-300 mt-4 rounded-2xl items-center justify-center min-h-[60vh] space-y-4 text-center">
+    <Bookmark size="60" class="text-gray-400 bg-gray-200 rounded-full max-w-2xl mx-auto px-4 py-4"/>
 
-    <!-- Message -->
-    <p class="text-red-600 text-lg font-semibold">
-      No bookmarks yet... 
+    <!-- MESSAGE -->
+    <p class="text-gray-700 font-semibold text-lg">
+      No bookmarks yet  
     </p>
 
-    <!-- Suggestion -->
-    <p class="text-gray-500 text-lg">
-      Start saving recipes you love!
+    <!-- SUGGESTION -->
+    <p class="text-gray-500 text-md">
+      Start bookmarking recipes to save them for later
     </p>
   </div>
 {:else}
 
-    <!-- Recipe Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+  <!-- RECIPE GRID -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
       {#each paginatedRecipes as recipe}
-        <div
-          class="bg-white rounded-xl shadow-md overflow-hidden transform transition hover:scale-[1.02] hover:shadow-lg cursor-pointer"
-          on:click={() => openRecipeModal(recipe._id)}
-        >
-          <!-- Image + Category Badge -->
-          <div class="relative">
-            <img src={recipe.image} alt={recipe.title} class="w-full h-48 object-cover" />
-            {#if recipe.category}
-              <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                {recipe.category}
-              </div>
-            {/if}
-          </div>
+  <div
+  class="group bg-white border border-gray-300 rounded-2xl shadow-md 
+         overflow-hidden hover:scale-[1.03] transition cursor-pointer 
+         w-full max-w-sm mx-auto mt-8 relative"
+  on:click={() => openRecipePage(recipe._id)}
+>
+  <img src={recipe.image} class="w-full h-64 object-cover" />
 
-          <!-- Title + Info -->
-          <div class="p-4">
-            <h2 class="text-lg font-semibold text-gray-800">{recipe.title}</h2>
-          </div>
+  <div class="p-5">
 
-          <!-- Unsave Button -->
-        <div class="px-4 pb-4 flex justify-end items-center">
-          <button
-            type="button"
-            class="flex items-center justify-center w-9 h-9 rounded-full 
-                  transition-all duration-200 ease-in-out 
-                  shadow-md hover:scale-110 active:scale-95
-                  bg-red-500 text-white hover:bg-red-600"
-            on:click|stopPropagation={() => toggleUnsave(recipe._id)}
-            aria-label="Remove Bookmark"
-          >
-            <!-- Solid Bookmark (since it's saved) -->
-            <i class="fa-solid fa-bookmark text-lg"></i>
-          </button>
-        </div>
-        </div>
-      {/each}
+    <!-- CATEGORY + DIFFICULTY -->
+    <div class="flex gap-2 mb-3">
+      <span class="px-3 py-1 text-xs rounded-md bg-[#ececec] text-[#000000]">
+        {recipe.category}
+      </span>
+
+      <span class={`px-3 py-1 text-xs rounded-md ${difficultyColor(recipe.difficulty)}`}>
+        {recipe.difficulty}
+      </span>
     </div>
 
-    <!-- Pagination -->
-    <div class="flex justify-center mt-8 gap-4">
+    <h3 class="text-xl text-[#000000] font-semibold mb-1">
+      {recipe.title}
+    </h3>
+
+    <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+      {recipe.description}
+    </p>
+
+    <!-- TIME + DELETE BUTTON -->
+    <div class="flex items-center justify-between text-gray-500 text-sm">
+      <div class="flex items-center gap-1">
+        <Clock size="14" />
+        <span>{recipe.estimatedTime}</span>
+      </div>
+
+      <!-- DELETE BUTTON (shows only on hover) -->
       <button
-        on:click={goToPrevPage}
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition disabled:opacity-50"
-        disabled={currentPage === 1}
+        class="p-2 rounded-lg hover:bg-gray-200 text-red-600 transition 
+               opacity-0 group-hover:opacity-100"
+        on:click={(e) => {
+          e.stopPropagation(); 
+          toggleUnsave(recipe._id);
+        }}
+        title="Remove from bookmarks"
       >
-        ← Back
+        <Trash2 size="18" />
       </button>
+    </div>
 
-      <span class="text-gray-700 font-medium">Page {currentPage} of {totalPages}</span>
+  </div>
+</div>
+{/each}
+</div>
 
-      <button
-        on:click={goToNextPage}
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition disabled:opacity-50"
+  <!-- PAGINATION -->
+  <div class="flex justify-center mt-10 items-center gap-4">
+
+    <button
+     on:click={goToPrevPage}
+      class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm
+            shadow-md border border-gray-300 text-gray-700
+            hover:bg-white hover:-translate-y-1 hover:shadow-lg transition 
+            disabled:opacity-40 disabled:translate-y-0"
+      disabled={currentPage === 1}
+    >
+      <span class="text-lg">←</span> Prev
+    </button>
+
+    <span class="text-gray-700 font-semibold text-lg px-4 py-2">
+      {currentPage} / {totalPages}
+    </span>
+
+    <button
+      on:click={goToNextPage}
+      class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm
+            shadow-md border border-gray-300 text-gray-700
+            hover:bg-white hover:-translate-y-1 hover:shadow-lg transition 
+            disabled:opacity-40 disabled:translate-y-0"
         disabled={currentPage === totalPages}
       >
-        Next →
+        Next <span class="text-lg">→</span>
       </button>
+
     </div>
+
   {/if}
-
-  <!-- Recipe Details Modal -->
-  {#if showModal && selectedRecipe}
-    <div
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      on:click={closeModal}
-    >
-      <div
-        class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-fadeIn relative"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="recipe-title"
-        on:click|stopPropagation
-      >
-        <!-- Image + Title -->
-        <div class="relative">
-          <img src={selectedRecipe.image} alt={selectedRecipe.title} class="w-full h-64 object-cover" />
-          <button
-            type="button"
-            class="absolute top-3 right-3 z-10 flex items-center justify-center 
-                   w-9 h-9 rounded-full bg-white/80 text-gray-700 
-                   shadow-md hover:bg-red-500 hover:text-white 
-                   transition-all duration-200 ease-in-out 
-                   hover:scale-110 active:scale-95"
-            on:click={closeModal}
-            aria-label="Close modal"
-          >
-            ✖
-          </button>
-          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-            <h2 id="recipe-title" class="text-2xl font-bold text-white drop-shadow-md">{selectedRecipe.title}</h2>
-          </div>
-        </div>
-
-        <!-- Details -->
-        <div class="p-6 max-h-[65vh] overflow-y-auto">
-          {#if selectedRecipe.category}
-            <p class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mb-4">
-              {selectedRecipe.category}
-            </p>
-          {/if}
-
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">Ingredients</h3>
-          <ul class="list-disc list-inside text-gray-700 mb-6 space-y-1">
-            {#each selectedRecipe.ingredients as ing}
-              <li>{ing}</li>
-            {/each}
-          </ul>
-
-          {#if selectedRecipe.steps && selectedRecipe.steps.length > 0}
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Steps</h3>
-            <p class="text-gray-700 whitespace-pre-line leading-relaxed mb-6">
-              {selectedRecipe.steps.join('\n\n')}
-            </p>
-          {/if}
-        </div>
-      </div>
-    </div>
-  {/if}
+  
 </section>
 
 <style>

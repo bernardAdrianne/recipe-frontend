@@ -1,0 +1,190 @@
+<script lang="ts">
+    import { goto } from '$app/navigation';
+    import { tick } from 'svelte';
+    import { fade } from 'svelte/transition';
+    import { User, Mail, Lock, Eye, EyeOff } from "lucide-svelte"; 
+
+    function navigateToSignin() {
+        goto('/signin');
+    }
+
+    let showPassword = false;
+    let username = "";
+    let email = "";
+    let password = "";
+    let successMessage = "";
+    let errorMessage = "";
+    let loading = false;
+
+    async function handleRegister(event: Event) {
+        event.preventDefault();
+
+        if (password.length < 6) {
+            errorMessage = "Password must be at least 6 characters.";
+            return;
+        }
+
+        try {
+            loading = true;
+            errorMessage = "";
+
+            const res = await fetch('http://localhost:3000/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    email,
+                    password
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                successMessage = "Account created successfully!";
+                await tick();
+                setTimeout(() => goto('/signin'), 2000);
+                localStorage.removeItem('guestSearchCount');
+            } else {
+                throw new Error(data.message || 'Signup failed');
+            }
+        } catch (err) {
+            if (err instanceof Error) {
+                console.error('Error:', err.message);
+                errorMessage = err.message;
+            }
+        } finally {
+            loading = false;
+        }
+    }
+</script>
+
+<div class="min-h-screen flex items-center justify-center bg-[#D2E4D2] px-4">
+<form 
+    class="bg-white border border-[#c4c4c4] w-full max-w-md rounded-3xl p-8 shadow-xl space-y-6" 
+    on:submit|preventDefault={handleRegister}>
+
+    <!-- Branding -->
+    <div class="flex flex-col items-center mb-4">
+      <a href="/user/home" class="flex items-center gap-2">
+        <h1
+          class="text-3xl font-extrabold bg-gradient-to-r from-[#115D33] to-[#2d974d] 
+            text-transparent bg-clip-text"
+          style="font-family: 'Nunito Sans', sans-serif;"
+        >
+          ReciPinoy
+        </h1>
+      </a>
+
+      <p class="text-sm text-gray-700 mt-2 font-medium">
+        Let's create your ReciPinoy account
+      </p>
+    </div>
+
+    <!-- Toast notifications -->
+    {#if successMessage}
+        <div transition:fade 
+            class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white 
+            px-6 py-3 rounded-xl shadow-lg z-50">
+            {successMessage}
+        </div>
+    {/if}
+
+    {#if errorMessage}
+        <div transition:fade 
+            class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white 
+            px-6 py-3 rounded-xl shadow-lg z-50">
+            {errorMessage}
+        </div>
+    {/if}
+
+    <!-- Username -->
+    <div class="relative">
+        <label for="username" class="block text-md text-gray-800 mb-2">
+            Username
+        </label>
+        <User class="absolute left-3 top-[47px] text-gray-400 w-5 h-5" />
+        <input
+            class="pl-10 border border-[#EBEBE8] rounded-xl p-4 w-full text-[#222831] 
+            focus:border-[#228B22] focus:outline-none"
+            type="text"
+            placeholder="Enter your username"
+            bind:value={username}
+            required
+        />
+    </div>
+
+    <!-- Email -->
+    <div class="relative">
+        <label for="email" class="block text-md text-gray-800 mb-2">
+            Email Address
+        </label>
+        <Mail class="absolute left-3 top-[47px] text-gray-400 w-5 h-5" />
+        <input
+            class="pl-10 border border-[#EBEBE8] rounded-xl p-4 w-full text-[#222831] 
+            focus:border-[#228B22] focus:outline-none"
+            type="email"
+            placeholder="user@email.com"
+            bind:value={email}
+            required
+        />
+    </div>
+
+    <!-- Password -->
+    <div class="relative">
+        <label for="username" class="block text-md text-gray-800 mb-2">
+            Password
+        </label>
+        <Lock class="absolute left-3 top-[47px] text-gray-400 w-5 h-5" />
+        <input
+            class="pl-10 border border-[#EBEBE8] rounded-xl p-4 w-full text-[#222831] 
+            focus:border-[#228B22] focus:outline-none"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            bind:value={password}
+            required
+        />
+        {#if password}
+            <button
+                class="absolute inset-y-0 right-3 flex items-center"
+                type="button"
+                on:click={() => (showPassword = !showPassword)}>
+                {#if showPassword}
+                    <EyeOff class="w-5 h-5 text-gray-400" />
+                {:else}
+                    <Eye class="w-5 h-5 text-gray-400" />
+                {/if}
+            </button>
+        {/if}
+    </div>
+
+    <!-- Submit -->
+    <button
+        class="bg-[#00a13e] text-white font-medium text-center text-sm rounded-xl 
+        p-4 w-full cursor-pointer shadow-md hover:scale-[1.02] hover:bg-[#228B22] 
+        transition duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed"
+        type="submit"
+        disabled={loading}>
+        {loading ? "Creating..." : "Create Account"}
+    </button>
+
+    <!-- Terms -->
+    <div class="text-center text-sm text-[#A5A4A1]">
+        By creating an account, you agree to the
+        <span class="underline cursor-pointer">Terms of Service</span>
+        and
+        <span class="underline cursor-pointer">Privacy Policy</span>.
+    </div>
+
+    <!-- Sign In -->
+    <p class="text-sm text-[#A5A4A1] text-center">
+        Already have an account?
+        <span class="text-[#050301] cursor-pointer font-semibold" on:click={navigateToSignin}>
+            Sign in
+        </span>
+    </p>
+
+</form>
+</div>
