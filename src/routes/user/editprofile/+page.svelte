@@ -42,7 +42,7 @@
 
   onMount(async () => {
     try {
-      const res = await fetch("https://recipe-frontend-eta-five.vercel.app/api/user/", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/", {
         method: "GET",
         credentials: "include",
         cache: "no-store",
@@ -86,7 +86,7 @@
         formData.append("profilePic", selectedFile);
         formData.append("folder", "profile-pictures");
 
-        const uploadRes = await fetch("https://recipe-frontend-eta-five.vercel.app/api/user/upload-profile-picture", {
+        const uploadRes = await fetch("https://airecipe-backend-2.onrender.com/api/user/upload-profile-picture", {
           method: "POST",
           body: formData,
           credentials: "include",
@@ -100,7 +100,7 @@
         }
       }
 
-      const res = await fetch("https://recipe-frontend-eta-five.vercel.app/api/user/editprofile", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/editprofile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

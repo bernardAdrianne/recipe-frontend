@@ -53,7 +53,7 @@
     }
     
     onMount(async () => {
-  const res = await fetch("https://recipe-frontend-eta-five.vercel.app/api/recipe/featured", {
+  const res = await fetch("https://airecipe-backend-2.onrender.com/api/recipe/featured", {
     credentials: "include"
   });
 
@@ -62,7 +62,7 @@
   // Fetch saved list 
   let savedIds: string[] = [];
   try {
-    const savedRes = await fetch("https://recipe-frontend-eta-five.vercel.app/api/saved", {
+    const savedRes = await fetch("https://airecipe-backend-2.onrender.com/api/saved", {
       credentials: "include"
     });
     const savedData = await savedRes.json();

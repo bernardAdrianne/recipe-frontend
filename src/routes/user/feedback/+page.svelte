@@ -112,10 +112,10 @@ async function loadFeedback(reset = false) {
   loadingMore = true;
 
   try {
-    let url = `https://recipe-frontend-eta-five.vercel.app/api/feedback/all?page=${page}`;
+    let url = `https://airecipe-backend-2.onrender.com/api/feedback/all?page=${page}`;
 
     if (sortBy === "all") {
-      url = `https://recipe-frontend-eta-five.vercel.app/api/feedback/all`;
+      url = `https://airecipe-backend-2.onrender.com/api/feedback/all`;
     } else {
       url += `&limit=6&sort=${sortBy}`;
     }
@@ -162,7 +162,7 @@ async function loadFeedback(reset = false) {
         formData.append("image", uploadedImageURL);
       }
 
-      const res = await fetch("http://localhost:3000/api/feedback/create", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/api/feedback/create", {
         method: "POST",
         body: formData
       });

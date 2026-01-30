@@ -43,11 +43,11 @@
 
   onMount(async () => {
     try {
-      const res = await fetch(`https://recipe-frontend-eta-five.vercel.app/api/recipe/${recipeId}`);
+      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/${recipeId}`);
       const data = await res.json();
       recipe = data.results;
 
-       const savedRes = await fetch("https://recipe-frontend-eta-five.vercel.app/api/saved", {
+       const savedRes = await fetch("https://airecipe-backend-2.onrender.com/api/saved", {
         method: "GET",
         credentials: "include"
       });
@@ -67,8 +67,8 @@
 
   async function toggleSave() {
     const endpoint = saved 
-      ? "https://recipe-frontend-eta-five.vercel.app/api/unsave"
-      : "https://recipe-frontend-eta-five.vercel.app/api/save";
+      ? "https://airecipe-backend-2.onrender.com/api/unsave"
+      : "https://airecipe-backend-2.onrender.com/api/save";
 
     try {
       const res = await fetch(endpoint, {
