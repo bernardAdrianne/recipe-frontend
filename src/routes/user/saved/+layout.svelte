@@ -1,8 +1,8 @@
   <script>
       import { page } from '$app/stores';
       import { derived } from "svelte/store";
-      import Footer from "$lib/user/footer.svelte";
-      import Contact from "$lib/user/contact.svelte";
+      import Footer from "$lib/components/user/footer.svelte";
+      import Contact from "$lib/components/user/contact.svelte";
       
       const isSaved = derived(page, $page => $page.url.pathname === "/user/saved");
   </script>

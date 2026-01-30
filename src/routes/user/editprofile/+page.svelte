@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  import Footer from "$lib/user/footer.svelte";
-  import Contact from "$lib/user/contact.svelte";
+  import Footer from "$lib/components/user/footer.svelte";
+  import Contact from "$lib/components/user/contact.svelte";
   import {
     BadgeCheck,
     BadgeAlert,

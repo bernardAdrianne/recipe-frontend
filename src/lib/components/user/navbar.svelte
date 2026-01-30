@@ -3,7 +3,7 @@
 	import { page } from "$app/stores";
 	import { goto } from "$app/navigation";
 	import { fade } from "svelte/transition";
-	import { isLoggedIn, user } from "../stores/userStore.js";
+	import { isLoggedIn, user } from "../../stores/userStore.js";
 	import { 
 		Home, 
 		Search, 

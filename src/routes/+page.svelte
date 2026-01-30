@@ -1,6 +1,6 @@
 <script>
-  import NavBar from '$lib/user/navbar.svelte'; 
-  import Contact from '$lib/user/contact.svelte';
+  import NavBar from '$lib/components/user/navbar.svelte'; 
+  import Contact from '$lib/components/user/contact.svelte';
   import Home from './user/home/+page.svelte';
 </script>
 

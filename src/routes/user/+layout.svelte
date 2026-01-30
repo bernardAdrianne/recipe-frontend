@@ -1,9 +1,9 @@
 <script>
     import { page } from '$app/stores';
     import { derived } from "svelte/store";
-    import NavBar from "$lib/user/navbar.svelte";
-    import Footer from "$lib/user/footer.svelte";
-    import Contact from "$lib/user/contact.svelte";
+    import NavBar from "$lib/components/user/navbar.svelte";
+    import Footer from "$lib/components/user/footer.svelte";
+    import Contact from "$lib/components/user/contact.svelte";
     
     const isHome = derived(page, $page => $page.url.pathname === "/user/home");
 </script>

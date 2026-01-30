@@ -3,8 +3,8 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { Clock, Bookmark, BookmarkCheck, ArrowLeft } from "lucide-svelte";
-  import Footer from "$lib/user/footer.svelte";
-  import Contact from "$lib/user/contact.svelte";
+  import Footer from "$lib/components/user/footer.svelte";
+  import Contact from "$lib/components/user/contact.svelte";
   import {
     BadgeCheck,
     BadgeAlert,
