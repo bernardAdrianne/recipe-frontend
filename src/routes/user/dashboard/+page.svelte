@@ -295,7 +295,7 @@
   <!-- TOP AI RECOMMENDATIONS -->
   {#if topAIRecipes.length > 0}
     <h3 class="text-2xl font-bold text-gray-800 mb-3">
-      Top AI Recommendations
+      Top Recommendations
     </h3>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -345,7 +345,7 @@
   <!-- LEAST RELEVANT AI RECOMMENDATIONS -->
   {#if otherAIRecipes.length > 0}
     <h3 class="text-xl font-semibold text-gray-700 mb-3">
-      Less Relevant AI Recommendations
+      Less Relevant Recommendations
     </h3>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">

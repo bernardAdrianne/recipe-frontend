@@ -133,7 +133,6 @@
  				<a href="/user/dashboard" class="flex items-center gap-2">
     				<h1 
       					class="text-3xl font-bold bg-gradient-to-r from-[#115D33] to-[#2d974d] text-transparent bg-clip-text"
-      					style="font-family: 'Nunito Sans', sans-serif;"
     				>
       				ReciPinoy
     				</h1>

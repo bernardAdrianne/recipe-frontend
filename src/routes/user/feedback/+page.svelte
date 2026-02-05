@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fade, scale } from "svelte/transition";
+  import { isLoggedIn } from "$lib/stores/userStore";
   import {
     MessageSquareOff,
     MessageSquare,
@@ -144,6 +145,11 @@ async function loadFeedback(reset = false) {
 }
 
   async function submitFeedback() {
+    if (!isLoggedIn) {
+      triggerToast("Please sign in first to submit feedback", "error", "top-center");
+      return;
+    }
+
     if (rating === 0 || !feedback.trim()) {
       triggerToast("Please provide a rating and feedback.", "error", "top-center");
       return;
@@ -408,11 +414,12 @@ async function loadFeedback(reset = false) {
     <!-- SUBMIT -->
     <button
       type="button"
-      disabled={submitting}
+      disabled={submitting || !$isLoggedIn}
       on:click={submitFeedback}
       class="flex items-center justify-center gap-2 bg-green-600
            hover:bg-green-700 text-white text-sm font-semibold
-            rounded-md py-2.5 w-full mt-4 transition disabled:opacity-70 disabled:cursor-not-allowed"
+            rounded-md py-2.5 w-full mt-4 transition 
+            disabled:opacity-50 disabled:cursor-not-allowed"
     >
   {#if submitting}
   <!-- SPINNER -->

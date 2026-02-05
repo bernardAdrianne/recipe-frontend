@@ -2,6 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { goto } from "$app/navigation";
     import { Sparkles, Clock, Search } from "lucide-svelte";
+    import { isLoggedIn } from "$lib/stores/userStore.js";
 
     const foodImages = [
       "/assets/adobo.png",
@@ -122,24 +123,35 @@
 
     <p class="text-gray-700 text-lg md:text-xl leading-relaxed">
       Find easy-to-cook Filipino dishes made from ingredients you already have. 
-      Experience the taste of home — simple, authentic, and made for every kitchen.
+      Experience the taste of home simple, authentic, and made for every kitchen.
     </p>
-
+    
     <div class="flex space-x-4">
+      {#if $isLoggedIn}
       <a 
         href="/user/dashboard"
         class="flex items-center gap-2 bg-[#115D33] text-white px-6 py-3 rounded-xl 
                 shadow-md hover:bg-[#0e4b2a] hover:scale-[1.03] transition"
       >
-      <Sparkles size="18" class="text-[#eb9dff]" />
+      <Sparkles size="18" class="text-[#ffffff]" />
       Discover Recipes
       </a>
+      {:else}
       <a 
-        href="/signin"
+        href="/user/dashboard"
+        class="flex items-center gap-2 bg-[#115D33] text-white px-6 py-3 rounded-xl 
+                shadow-md hover:bg-[#0e4b2a] hover:scale-[1.03] transition"
+      >
+      <Sparkles size="18" class="text-[#ffffff]" />
+      Discover Recipes
+      </a>
+      <a
+        on:click={() => goto("/signin")}
         class="border border-[#115D33] text-[#115D33] px-6 py-3 rounded-xl hover:bg-[#115D33] hover:text-white shadow-md hover:shadow-lg transition"
       >
         Sign In
       </a>
+      {/if}
     </div>
   </div>
 
@@ -192,7 +204,7 @@
   </h2>
 
   <p class="text-gray-600 text-lg max-w-2xl mx-auto text-center mb-12">
-    AI-powered recipe ideas for common home ingredients.
+    Recipe recommndation ideas for common home ingredients.
   </p>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 
