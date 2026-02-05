@@ -42,7 +42,7 @@
 
   onMount(async () => {
     try {
-      const res = await fetch("https://airecipe-backend-2.onrender.comapi/user/", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/", {
         method: "GET",
         credentials: "include",
       });
@@ -72,7 +72,7 @@
   async function confirmDel() {
     deleting = true;
     try {
-      const res = await fetch("https://airecipe-backend-2.onrender.comapi/user/", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/api/user/", {
         method: "DELETE",
         credentials: "include",
       });
