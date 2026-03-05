@@ -112,7 +112,7 @@
   </script>
 
 <!-- HERO SECTION -->
-<section class="bg-[#e4ffdd] min-h-[90vh] flex flex-col md:flex-row items-center justify-between px-8 md:px-16 lg:px-32 py-12 overflow-hidden">
+<section class="bg-[#ececec] min-h-[90vh] flex flex-col md:flex-row items-center justify-between px-8 md:px-16 lg:px-32 py-12 overflow-hidden">
   <span class="animate-spinOutRight hidden"></span>
 
   <div class="flex flex-col items-start space-y-6 max-w-xl">
@@ -139,7 +139,7 @@
       {:else}
       <a 
         href="/user/dashboard"
-        class="flex items-center gap-2 bg-[#115D33] text-white px-6 py-3 rounded-xl 
+        class="flex items-center gap-2 bg-[#115D33] text-white px-6 py-3 rounded-md
                 shadow-md hover:bg-[#0e4b2a] hover:scale-[1.03] transition"
       >
       <Sparkles size="18" class="text-[#ffffff]" />
@@ -147,7 +147,7 @@
       </a>
       <a
         on:click={() => goto("/signin")}
-        class="border border-[#115D33] text-[#115D33] px-6 py-3 rounded-xl hover:bg-[#115D33] hover:text-white shadow-md hover:shadow-lg transition"
+        class="border border-[#115D33] text-[#115D33] px-6 py-3 rounded-md hover:bg-[#115D33] hover:text-white shadow-md hover:shadow-lg transition"
       >
         Sign In
       </a>

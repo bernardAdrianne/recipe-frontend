@@ -12,7 +12,10 @@
     BadgeAlert,
     TriangleAlert,
     CircleX,
-    Loader
+    Loader,
+
+	KeyboardIcon
+
   } from "lucide-svelte";
 
   let toastMessage = "";
@@ -38,6 +41,43 @@
     category?: string;
     saved?: boolean;
   }
+
+  const rawIngredients = [
+    "Chicken", "Chicken cube", "Pork Belly", "Pork Loin", "Pork Spleen", 
+    "Pork Liver", "Pork Blood", "Ground Pork", "Pork Broth", "Cooking oil", 
+    "Beed Tenderloin", "Glutinous rice", "Water", "Sugar", "Cocoa tablea", "Salt", "Tuyo",
+    "Whole wheat flour", "Buttermilk", "Egg", "Baking Powder", "Baking Soda", "Brown Sugar",
+    "Butter", "Tocino", "Cooked rice", "Cheddar cheese", "Tortillas", "Lettuce", "Tomato", "Fresh milk",
+    "Vinegar", "Onion", "Ground black pepper", "Ham", "Hotdog", "Rice", "Sweet rice", "Green Onion", "Ginger",
+    "safflower", "Turmeric powder", "Fish sauce", "Dark brown sugar", "Smoked paprika", "Vegetable oil",
+    "Red hotdogs", "Garlic fried rice", "Soy sauce", "Canola oil", "white rice", "Bacon", "Green peas", 
+    "Condensed milk", "Fresh milk", "Granulated sugar", "Purple yam", "Ube flavoring", 
+    "Saba bananas", "Potatoes", "Canned chickpeas", "Long green peas", "Cabbage", "Bok choy", "Chorizo de Bilbao", 
+    "Tomato paste", "black pepper", "Bay leaves", "Pepper", "Misua", "Hot pper leaves", "Magic sarap",
+    "Pineapple juice", "Pineapple chunks", "Peppercorn", "Exra firm tofu", "Broccoli florets", "Carrot",
+    "Oyster sauce", "Pork cube", "Bell pepper", "Laurel leaves", "White vinegar", "Curry powder", "Potato",
+    "Celery", "red bell pepper", "Long green pepper", "Coconut milk", "All purpose cream", "Beef shank", "Corn",
+    "Whole peppercorn", "Green onions", "Ground beef", "Burger buns", "Cheese", "Banana ketchuo", "Lady's Choice Mayonaise",
+    "beef franks", "Hotdog buns", "Cheese sauce", "Bacon bits", "Rice noodles", "Anatto powder", "Shrimp buillon",  
+    "All purpose flour", "Firm tofu", "Tinapa flakes", "Chicaron", "Boiled egg", "Cooked shrimp", "Scallions", 
+    "Toasted Garlic", "Ampalaya", "Raw eggs", "Luke warm water", "Patola", "Beef cube", "Olive oil", 
+    "Worcestershire Sauce", "Saging na saba", "Vanilla extract", "Peanuts", "Banana", "Jackfruit", "Lumpia wrapper",   
+    "Cassava", "Melted butter", "Coconut strips", "Carnation condensada", "Sago pearls", "Powdered gelatin", "Pandan leaves",
+    "Buko pandan flavoring", "Elbow macaroni", "Mayonnaise", "Fruit coctail", "Pinapple chunks", "Raisins", "Kaong",
+    "Nata de coco", "Pork chops", "Lime", "Rice washing", "Green papaya", "Boneless bangus", "Kangkong leaves",
+    "Daikon radish", "Snake beans", "Okra", "Taro", "Knorr sinigang sa sampaloc mix original", "Pig liver", "Lemon",
+    "Tomato sauce", "Red onion", "Chicken broth", "Lechon kawali", "Knorr shrimp cubes", "Sitaw", "Kalabasa",
+    "Eggplant", "Kamote", "Bagoong alamang", "Mung beans", "Pork", "Spinach", "Knorr beef cube",
+    "Crushed pork rind", "Tilapia", "Oxtail", "Banana flower bud", "Pechay or pork bachoy", "Ground peanuts", "Peanut butter",
+    "Shrimp paste", "Annatto seeds", "Toasted ground rice", "Long grain white rice", "Rousung", "Garlic powder", "Yellow onion",
+    "Lechon roasted pork", "Calamansi", "Light mayonnaise", "Hot sauce", "Margarine", "Boiled eggs", "Dry sherry",
+    "Pork hock", "Liquid seasoning", "Coconut cream", "Chili pepper", "Serrano pepper", "Ketchup", "Knorr pork cube",
+    "Whipping cream", "Graham crackers", "Maraschino cherries", "Crushed graham", "Beef neck bones", "Beef chuck", "Green olives",
+    "Beed powder", "Liver spread", "Cornstarch"   
+  ];
+  let ghostText = "";
+  let suggestions: string[] = [];
+  let showSuggestions = false;
 
   // Ingredient input + list
   let ingredientText = "";
@@ -156,6 +196,38 @@
       return "bg-gray-100 text-gray-700";
   }
 }
+
+  function updateGhostText() {
+      const text = ingredientText.toLowerCase().trim();
+
+      if (!text) {
+        ghostText = "";
+        return;
+      }
+
+      const match = rawIngredients.find((ing) =>
+            ing.toLowerCase().startsWith(text)
+    );
+
+      if (match && match.toLowerCase() !== text) {
+        ghostText = match;
+      } else {
+        ghostText = "";
+      }
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key ===  "Tab" && ghostText) {
+      e.preventDefault();
+      ingredientText = ghostText;
+      ghostText = "";
+    }  
+  }
+
+  function handldeInput() {
+    updateGhostText();
+  }
+
 </script>
 
 <section class="max-w-6xl mx-auto px-4 py-20 min-h-[85vh]">
@@ -214,13 +286,29 @@
 <div class="max-w-2xl mx-auto mb-6">
   <div class="bg-white border border-gray-300 p-6 rounded-2xl shadow-lg">
 
+    <!-- GHOST TEXT -->
+    {#if ghostText}
+      <div class="absolute insert-0 px-4 py-2
+                  text-gray-400 pointer-events-none
+                  flex items-center"
+      >
+        <span class="invisible">
+          {ingredientText}
+        </span>
+        <span>
+          {ghostText.slice(ingredientText.length)}
+        </span>
+      </div>
+    {/if}
+
     <!-- SEARCH AND ADD BUTTON -->
     <div class="flex gap-2">
       <input
         class="bg-gray-200 flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400"
-        placeholder="Enter an ingredient (e.g. chicken, tomatoes, pasta)"
+        placeholder="Enter an ingredient (e.g. chicken, tomatoes)"
         bind:value={ingredientText}
-        on:keydown={(e) => e.key === "Enter" && addIngredient()}
+        on:input={handldeInput}
+        on:keydown={handleKeydown}
       />
 
       <button 
