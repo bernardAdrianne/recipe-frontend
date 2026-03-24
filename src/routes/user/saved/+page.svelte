@@ -44,7 +44,7 @@
 
   async function toggleUnsave(id: string) {
     try {
-      const res = await fetch('https://airecipe-backend-2.onrender.com/api/unsave', {
+      const res = await fetch('https://airecipe-backend-2.onrender.com/unsave', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -65,7 +65,7 @@
 
   async function fetchSavedRecipes() {
     try {
-      const res = await fetch('https://airecipe-backend-2.onrender.com/api/saved', {
+      const res = await fetch('https://airecipe-backend-2.onrender.com/saved', {
         method: 'GET',
         credentials: 'include',
       });
@@ -161,8 +161,8 @@
 {/if}
 
   <div class="flex mt-6 gap-2">
-    <Bookmark size="42" class="text-black-700 bg-green-200 rounded-full p-2"/>
-    <h1 class="text-4xl text-[#000000] mb-6">My Bookmarks</h1>
+    <Bookmark size="42" class="text-black-700 bg-[#f59e0b] rounded-full p-2"/>
+    <h1 class="text-4xl font-semibold text-[#000000] mb-6">My Bookmarks</h1>
   </div>
 
     <p class="text-2xl text-gray-600">You saved recipes for quick access</p>
@@ -188,7 +188,7 @@
       {#each paginatedRecipes as recipe}
   <div
   class="group bg-white border border-gray-300 rounded-2xl shadow-md 
-         overflow-hidden hover:scale-[1.03] transition cursor-pointer 
+         overflow-hidden hover:border-gray-400 hover:scale-[1.03] transition cursor-pointer 
          w-full max-w-sm mx-auto mt-8 relative"
   on:click={() => openRecipePage(recipe._id)}
 >

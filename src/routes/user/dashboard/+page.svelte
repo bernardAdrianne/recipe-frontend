@@ -13,9 +13,9 @@
     TriangleAlert,
     CircleX,
     Loader,
-
-	KeyboardIcon
-
+    Sparkles,
+	  KeyboardIcon,
+    Sparkle
   } from "lucide-svelte";
 
   let toastMessage = "";
@@ -133,7 +133,7 @@
 
     try {
       const query = ingredientList.join(",");
-      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/search?ingredient=${encodeURIComponent(query)}`, {
+      const res = await fetch(`https://airecipe-backend-2.onrender.com/recipe/search?ingredient=${encodeURIComponent(query)}`, {
         credentials: "include",
       });
 
@@ -279,7 +279,7 @@
   </div>
 {/if}
 
-      <h1 class="text-4xl md:text-5xl text-[#000000] text-center mb-5">Find your perfect Recipe</h1>
+      <h1 class="text-4xl md:text-5xl  font-semibold text-[#0f1b2d] text-center mb-5">Find your perfect Recipe</h1>
       <p class="text-gray-600 text-lg text-center mx-w-2xl mx-auto mb-10">Enter the ingredients you have and discover what you can make</p>
 
  <!-- SEARCH BOX CONTAINER -->
@@ -312,8 +312,8 @@
       />
 
       <button 
-        class="px-4 py-2 flex items-center gap-2 bg-[#228B22] text-white 
-               rounded-lg hover:bg-[#1a5f17] hover:scale-[1.03] transition"
+        class="px-4 py-2 flex items-center gap-2 bg-amber-600 text-white 
+               rounded-lg hover:bg-amber-500 hover:scale-[1.03] transition"
         on:click={addIngredient}
       > 
         <Plus size="14" class="text-white" />
@@ -340,9 +340,9 @@
 
 <!-- SEARCH BUTTON -->
 <button
-  class="w-full mt-4 py-3 bg-black text-white rounded-lg
+  class="w-full mt-4 py-3 bg-[#0f1b2d] text-white rounded-lg
          flex items-center justify-center gap-2
-         hover:bg-gray-800 hover:scale-[1.03] transition
+         hover:bg-[#1a2d47] transition hover:shadow-sm
          disabled:opacity-70 disabled:cursor-not-allowed"
   on:click={searchByIngredientList}
   disabled={isLoading}
@@ -356,8 +356,8 @@
 
   <span>Searching...</span>
   {:else}
-    <Search size="18" class="text-white" />
-    <span>Search Recipes</span>
+    <Sparkles size="18" class="text-white" />
+    <span>Find Recipes</span>
   {/if}
 </button>
 
@@ -390,7 +390,7 @@
       {#each topAIRecipes as r}
         <div
           class="bg-white border border-gray-300 rounded-2xl shadow-md
-                 overflow-hidden hover:scale-[1.03] transition cursor-pointer
+                 overflow-hidden hover:border-gray-400 hover:scale-[1.03] transition cursor-pointer
                  w-full max-w-sm mx-auto"
           on:click={() => openRecipePage(r.id)}
         >
@@ -440,7 +440,7 @@
       {#each otherAIRecipes as r}
         <div
           class="bg-white border border-gray-300 rounded-2xl shadow-md
-                 overflow-hidden hover:scale-[1.03] transition cursor-pointer
+                 overflow-hidden hover:border-gray-400 hover:scale-[1.03] transition cursor-pointer
                  w-full max-w-sm mx-auto"
           on:click={() => openRecipePage(r.id)}
         >

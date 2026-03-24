@@ -73,7 +73,7 @@
 		}
 
 		try {
-			const res = await fetch("https://airecipe-backend-2.onrender.com/api/auth/check-session", {
+			const res = await fetch("https://airecipe-backend-2.onrender.com/auth/check-session", {
 				credentials: "include",
 			});
 			if (res.ok) {
@@ -100,7 +100,7 @@
 		event.preventDefault();
 
 		try {
-			const res = await fetch("https://airecipe-backend-2.onrender.com/api/auth/logout", {
+			const res = await fetch("https://airecipe-backend-2.onrender.com/auth/logout", {
 				method: "POST",
 				credentials: "include",
 			});
@@ -125,116 +125,122 @@
 	}
 </script>
 
-<header class="shadow-md backdrop-blur-md sticky top-0 z-50 bg-white/90">
+<header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		<div class="flex justify-between items-center h-16">
-			<!-- Logo -->
+		<div class="flex items-center justify-between h-16">
+			<!-- Logo with Icon -->
 			<div class="flex-shrink-0">
- 				<a href="/user/dashboard" class="flex items-center gap-2">
-    				<h1 
-      					class="text-3xl font-bold bg-gradient-to-r from-[#115D33] to-[#2d974d] text-transparent bg-clip-text"
-    				>
-      				ReciPinoy
-    				</h1>
-  				</a>
+				<a href="/user/dashboard" class="flex items-center gap-2 group">
+					<!-- Logo Icon -->
+
+						<img 
+							src="/assets/LOGO.png" 
+							alt="ReciPinoy Logo" 
+							class="w-8 h-8 object-contain"
+						/>
+
+					<!-- Text Logo -->
+					<h1 class="text-2xl font-bold text-[#0f1b2d] group-hover:text-[#1a2d47] transition-colors">
+						ReciPinoy
+					</h1>
+				</a>
 			</div>
 
-			<!-- Navigation + Search -->
-			<div class="flex items-center space-x-6">
-				<!-- Navigation Links -->
-				<div class="relative hidden md:flex space-x-6 items-center">
+			<!-- Centered Navigation Links -->
+			<div class="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
+				<div class="flex items-center space-x-1 bg-gray-50/80 backdrop-blur-sm rounded-lg p-1">
 					<a
-  					href="/user/home"
-  					class="flex items-center gap-2 px-3 py-1 rounded-lg transition duration-200
-    				hover:bg-gray-200 hover:text-[#115D33]
-    				{ $page.url.pathname === '/user/home' ? 'bg-[#d6f5e4] text-[#115D33]' : 'text-[#000000]' }"
+						href="/user/home"
+						class="flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200
+							{$page.url.pathname === '/user/home' 
+								? 'bg-amber-500 text-white shadow-md' 
+								: 'text-gray-700 hover:bg-amber-100 hover:text-amber-700'}"
 					>
-  					<Home size="20" />
-  					Home
+						<Home size="18" />
+						<span>Home</span>
 					</a>
 
 					<a
-  					href="/user/dashboard"
-  					class="flex items-center gap-2 py-1 px-2 rounded-lg transition duration-200
-    				hover:bg-gray-200 hover:text-[#115D33]
-    				{ $page.url.pathname === '/user/dashboard' ? 'bg-[#d6f5e4] text-[#115D33]' : 'text-[#000000]' }"
+						href="/user/dashboard"
+						class="flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200
+							{$page.url.pathname === '/user/dashboard' 
+								? 'bg-amber-500 text-white shadow-md' 
+								: 'text-gray-700 hover:bg-amber-100 hover:text-amber-700'}"
 					>
-  					<Search size="20" />
-  					Find Recipes
+						<Search size="18" />
+						<span>Find Recipes</span>
 					</a>
-
 
 					<a
-  					href="/user/feedback"
-  					class="flex items-center gap-2 py-1 px-2 rounded-lg transition duration-200
-    				hover:bg-gray-200 hover:text-[#115D33]
-    				{ $page.url.pathname === '/user/feedback' ? 'bg-[#d6f5e4] text-[#115D33]' : 'text-[#000000]' }"
+						href="/user/feedback"
+						class="flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200
+							{$page.url.pathname === '/user/feedback' 
+								? 'bg-amber-500 text-white shadow-md' 
+								: 'text-gray-700 hover:bg-amber-100 hover:text-amber-700'}"
 					>
-  					<MessageSquare size="20" />
-  					Feedback
+						<MessageSquare size="18" />
+						<span>Feedback</span>
 					</a>
-
-					{#if $isLoggedIn}
-						<!-- Profile Dropdown -->
-						<div class="relative">
-							<button
-								id="profileButton"
-								on:click={toggleDropdown}
-								aria-label="profile dropdown"
-								class="text-[#000000] hover:text-[#797877] transition duration-200 focus:outline-none hover:scale-[1.08]"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="28"
-									height="28"
-									viewBox="0 0 512 512"
-								>
-									<path
-										fill="currentColor"
-										fill-rule="evenodd"
-										d="M256 42.667A213.333 213.333 0 0 1 469.334 256c0 117.821-95.513 213.334-213.334 213.334c-117.82 0-213.333-95.513-213.333-213.334C42.667 138.18 138.18 42.667 256 42.667m21.334 234.667h-42.667c-52.815 0-98.158 31.987-117.715 77.648c30.944 43.391 81.692 71.685 139.048 71.685s108.104-28.294 139.049-71.688c-19.557-45.658-64.9-77.645-117.715-77.645M256 106.667c-35.346 0-64 28.654-64 64s28.654 64 64 64s64-28.654 64-64s-28.653-64-64-64"
-									/>
-								</svg>
-							</button>
-
-							{#if showDropdown}
-								<div
-									id="profileDropdown"
-									class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
-								>
-									<a href="/user/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-									<a href="/user/saved" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Bookmarked</a>
-									<button
-										on:click={confirmLogout}
-										class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-									>
-										Logout
-									</button>
-								</div>
-							{/if}
-						</div>
-					{:else}
-						<!-- Guest / Not logged in -->
-						<div class="flex items-center space-x-4">
-							<a
-								href="/signin"
-								class="text-[#000000] border border-[#000000] px-2 py-1 rounded-lg
-								 hover:bg-[#115D33] hover:text-white transition
-								   shadow-xl hover:shadow-lg hover:scale-[1.08]"
-							>
-								Sign in
-							</a>
-							<a
-								href="/signup"
-								class="bg-[#000000] text-white px-2 py-1 rounded-lg
-								 hover:bg-[#0e4b2a] transition
-								  shadow-xl hover:shadow-lg hover:scale-[1.08]"
-							>
-								Sign up
-							</a>
-						</div>
-					{/if}
 				</div>
+			</div>
+
+			<!-- Right side - Auth buttons / Profile -->
+			<div class="flex items-center space-x-3">
+				{#if $isLoggedIn}
+					<!-- Profile Dropdown -->
+					<div class="relative">
+						<button
+							id="profileButton"
+							on:click={toggleDropdown}
+							aria-label="profile dropdown"
+							class="flex items-center gap-2 bg-gray-100 hover:bg-amber-100 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-[1.02]"
+						>
+							<div class="w-8 h-8 bg-[#0f1b2d] rounded-full flex items-center justify-center text-white">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+								</svg>
+							</div>
+							<span class="text-sm font-medium text-gray-700">Profile</span>
+						</button>
+
+						{#if showDropdown}
+							<div
+								id="profileDropdown"
+								class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1"
+							>
+								<a href="/user/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700">Profile</a>
+								<a href="/user/saved" class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700">Bookmarked</a>
+								<div class="border-t border-gray-100 my-1"></div>
+								<button
+									on:click={confirmLogout}
+									class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+								>
+									Logout
+								</button>
+							</div>
+						{/if}
+					</div>
+				{:else}
+					<!-- Guest / Not logged in - Improved buttons -->
+					<div class="flex items-center space-x-2">
+						<a
+							href="/signin"
+							class="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg
+								hover:bg-amber-50 hover:text-amber-700 hover:scale-[1.02]
+								transition-all duration-200"
+						>
+							Sign in
+						</a>
+						<a
+							href="/signup"
+							class="px-4 py-2 text-sm font-medium text-white bg-[#0f1b2d] rounded-lg
+								hover:bg-[#1a2d47] hover:scale-[1.02] hover:shadow-md
+								transition-all duration-200"
+						>
+							Sign up
+						</a>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

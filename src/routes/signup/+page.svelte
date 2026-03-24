@@ -55,7 +55,7 @@
     try {
       loading = true;
 
-      const res = await fetch('https://airecipe-backend-2.onrender.com/api/auth/signup', {
+      const res = await fetch('https://airecipe-backend-2.onrender.com/auth/signup', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ username, email, password })
@@ -140,21 +140,21 @@
 <svg 
   in:fly={{ x: -50, duration: 600 }}
   class="fixed -top-52 -left-64 w-[600px] h-[600px] z-0 opacity-90" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <path fill="#00B75A" d="M64.2,-19C73.3,7.2,64.1,41.3,42.9,56.1C21.6,70.8,-11.5,66.1,-35.9,48.6C-60.3,31.1,-75.9,0.7,-68.4,-23.2C-61,-47.1,-30.5,-64.6,-1.5,-64.1C27.5,-63.6,55.1,-45.2,64.2,-19Z" transform="translate(100 100)" />
+  <path fill="#003366" d="M64.2,-19C73.3,7.2,64.1,41.3,42.9,56.1C21.6,70.8,-11.5,66.1,-35.9,48.6C-60.3,31.1,-75.9,0.7,-68.4,-23.2C-61,-47.1,-30.5,-64.6,-1.5,-64.1C27.5,-63.6,55.1,-45.2,64.2,-19Z" transform="translate(100 100)" />
 </svg>
 
 <!-- Top-right small blob -->
 <svg 
   in:fly={{ x: 100, duration: 600 }}
   class="fixed -top-3 -right-1 w-[500px] h-[500px] z-0 opacity-50" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <path fill="#00B75A" d="M41.9,-16.9C47.4,3.2,40.1,24.2,24.5,36C9,47.9,-14.9,50.6,-33.6,38.7C-52.4,26.9,-66.1,0.5,-59.7,-21C-53.2,-42.5,-26.6,-59.1,-4.2,-57.8C18.2,-56.4,36.4,-37.1,41.9,-16.9Z" transform="translate(100 100)" />
+  <path fill="#004080" d="M41.9,-16.9C47.4,3.2,40.1,24.2,24.5,36C9,47.9,-14.9,50.6,-33.6,38.7C-52.4,26.9,-66.1,0.5,-59.7,-21C-53.2,-42.5,-26.6,-59.1,-4.2,-57.8C18.2,-56.4,36.4,-37.1,41.9,-16.9Z" transform="translate(100 100)" />
 </svg>
 
 <!-- Bottom blob large -->
 <svg 
   in:fly={{ x: 50, duration: 600 }}
   class="fixed -bottom-[200px] -right-40 w-[700px] h-[700px] z-0 opacity-100" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <path fill="#00964F" d="M57,-43.7C72.4,-26.2,82.4,-2.5,77.7,17.6C73,37.7,53.6,54.3,31,65.6C8.5,76.9,-17.2,83,-37.7,74.5C-58.2,66.1,-73.4,43.2,-78.1,19C-82.7,-5.2,-76.6,-30.7,-61.8,-48.1C-47,-65.4,-23.5,-74.6,-1.3,-73.5C20.8,-72.5,41.6,-61.1,57,-43.7Z" transform="translate(100 100)" />
+  <path fill="#001f3f" d="M57,-43.7C72.4,-26.2,82.4,-2.5,77.7,17.6C73,37.7,53.6,54.3,31,65.6C8.5,76.9,-17.2,83,-37.7,74.5C-58.2,66.1,-73.4,43.2,-78.1,19C-82.7,-5.2,-76.6,-30.7,-61.8,-48.1C-47,-65.4,-23.5,-74.6,-1.3,-73.5C20.8,-72.5,41.6,-61.1,57,-43.7Z" transform="translate(100 100)" />
 </svg>
 
   <!-- NAV LINK / Breadcrumb on top of container -->
@@ -171,7 +171,7 @@
 <!-- CONTAINER -->
 <div
   in:fly={{ y: 20, duration: 600 }}
-  class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-5xl flex flex-col md:flex-row">
+  class="bg-white border border-gray-300 rounded-3xl shadow-2xl overflow-hidden w-full max-w-5xl flex flex-col md:flex-row">
 
 <!-- LEFT SIDE: FORM -->
 <div class="w-full md:w-1/2 p-8 md:p-12 flex items-center justify-center">
@@ -262,7 +262,7 @@
       bind:value={username}
       required
       class="w-full p-4 rounded-xl border border-gray-300 text-gray-800
-            focus:ring-2 focus:ring-green-500 focus:outline-none"
+            focus:ring-1 focus:ring-[#0f1b2d] focus:outline-none"
     />
   </div>
 
@@ -288,7 +288,7 @@
       bind:value={email}
       required
       class="w-full p-4 rounded-xl border border-gray-300 text-gray-800
-            focus:ring-2 focus:ring-green-500 focus:outline-none"
+            focus:ring-1 focus:ring-[#0f1b2d] focus:outline-none"
     />
   </div>
 
@@ -317,7 +317,7 @@
         bind:value={password}
         required
         class="w-full p-4 pr-12 rounded-xl border border-gray-300 text-gray-800
-              focus:ring-2 focus:ring-green-500 focus:outline-none"
+              focus:ring-1 focus:ring-[#0f1b2d] focus:outline-none"
       />
 
        <!-- Show / Hide Button -->
@@ -344,7 +344,7 @@
       type="checkbox" 
       id="terms" 
       required 
-      class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-2 focus:ring-green-500" />
+      class="w-4 h-4 text-[#0f1b2d] border-navy-700 rounded focus:ring-2 focus:ring-[#1a2d47]" />
     <label 
       for="terms" 
       class="text-gray-600 text-sm">
@@ -356,13 +356,13 @@
   <button 
     type="submit" 
     disabled={loading}
-    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium p-4 rounded-xl shadow-md transition duration-200">
+    class="w-full bg-[#0f1b2d] hover:bg-[#1a2d47] text-white font-medium p-4 rounded-xl shadow-md transition duration-200">
     {loading ? "Creating..." : "Create Account"}
   </button>
 
   <p class="text-sm text-center text-gray-500">
     Already have an account? 
-      <span class="text-green-700 cursor-pointer font-semibold" on:click={navigateToSignin}>Sign in</span>
+      <span class="text-[#0f1b2d] hover:underline cursor-pointer font-semibold" on:click={navigateToSignin}>Sign in</span>
   </p>
 </form>
 </div>

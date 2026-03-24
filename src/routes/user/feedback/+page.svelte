@@ -113,10 +113,10 @@ async function loadFeedback(reset = false) {
   loadingMore = true;
 
   try {
-    let url = `https://airecipe-backend-2.onrender.com/api/feedback/all?page=${page}`;
+    let url = `https://airecipe-backend-2.onrender.com/feedback/all?page=${page}`;
 
     if (sortBy === "all") {
-      url = `https://airecipe-backend-2.onrender.com/api/feedback/all`;
+      url = `https://airecipe-backend-2.onrender.com/feedback/all`;
     } else {
       url += `&limit=6&sort=${sortBy}`;
     }
@@ -168,7 +168,7 @@ async function loadFeedback(reset = false) {
         formData.append("image", uploadedImageURL);
       }
 
-      const res = await fetch("https://airecipe-backend-2.onrender.com/api/feedback/create", {
+      const res = await fetch("https://airecipe-backend-2.onrender.com/feedback/create", {
         method: "POST",
         body: formData
       });
@@ -281,8 +281,8 @@ async function loadFeedback(reset = false) {
 
   <!-- HEADER -->
   <div class="flex mt-6 gap-2 items-center">
-    <MessageSquare size="42" class="bg-green-200 rounded-full p-2"/>
-    <h1 class="text-4xl">Community Feedback</h1>
+    <MessageSquare size="42" class="bg-[#f59e0b] rounded-full p-2"/>
+    <h1 class="text-4xl font-semibold">Community Feedback</h1>
   </div>
 
   <p class="text-2xl text-gray-600">
@@ -298,7 +298,7 @@ async function loadFeedback(reset = false) {
 
     <!-- HEADER -->
     <div class="flex items-center gap-2">
-      <ChefHat size="20" class="text-green-700"/>
+      <ChefHat size="20" class="text-[#f59e0b]"/>
       <h2 class="text-md font-semibold">Share your Story</h2>
     </div>
 
@@ -311,7 +311,7 @@ async function loadFeedback(reset = false) {
         bind:value={name}
         placeholder="Enter your name (or stay anonymous)"
         class="bg-gray-100 focus:bg-white border border-transparent
-               focus:border-green-400 rounded-md px-3 py-2
+               focus:border-[#0f1b2d] rounded-md px-3 py-2
                w-full text-sm outline-none transition"
       />
     </div>
@@ -351,7 +351,7 @@ async function loadFeedback(reset = false) {
         bind:value={feedback}
         placeholder="Tell us what you think about ReciPinoy..."
         class="bg-gray-100 focus:bg-white border border-transparent
-               focus:border-green-400 rounded-md px-3 py-2
+               focus:border-[#0f1b2d] rounded-md px-3 py-2
                w-full text-sm outline-none transition"
       />
     </div>
@@ -365,7 +365,7 @@ async function loadFeedback(reset = false) {
         bind:value={experience}
         placeholder="Beginner, home cook, or food enthusiast?"
         class="bg-gray-100 focus:bg-white border border-transparent
-               focus:border-green-400 rounded-md px-3 py-2
+               focus:border-[#0f1b2d] rounded-md px-3 py-2
                w-full text-sm outline-none transition"
       />
     </div>
@@ -394,7 +394,7 @@ async function loadFeedback(reset = false) {
   {:else}
     <label
       for="imageUpload"
-      class="bg-gray-100 hover:bg-gray-200 border border-dashed
+      class="bg-gray-100 hover:border-[#0f1b2d] hover:bg-gray-200 border border-dashed
              border-gray-400 rounded-md h-24 w-full
              flex items-center justify-center cursor-pointer
              transition"
@@ -416,8 +416,8 @@ async function loadFeedback(reset = false) {
       type="button"
       disabled={submitting || !$isLoggedIn}
       on:click={submitFeedback}
-      class="flex items-center justify-center gap-2 bg-green-600
-           hover:bg-green-700 text-white text-sm font-semibold
+      class="flex items-center justify-center gap-2 bg-[#001f3f]
+           hover:bg-[#1a2d47] text-white text-sm font-semibold
             rounded-md py-2.5 w-full mt-4 transition 
             disabled:opacity-50 disabled:cursor-not-allowed"
     >
