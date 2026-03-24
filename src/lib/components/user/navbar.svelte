@@ -134,7 +134,7 @@
 					<!-- Logo Icon -->
 
 						<img 
-							src="/assets/LOGO.png" 
+							src="/assets/logo.png" 
 							alt="ReciPinoy Logo" 
 							class="w-8 h-8 object-contain"
 						/>
