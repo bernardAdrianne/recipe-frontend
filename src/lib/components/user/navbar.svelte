@@ -73,7 +73,7 @@
 		}
 
 		try {
-			const res = await fetch("https://airecipe-backend-2.onrender.com/auth/check-session", {
+			const res = await fetch("https://airecipe-backend-2.onrender.com/api/auth/check-session", {
 				credentials: "include",
 			});
 			if (res.ok) {
@@ -100,7 +100,7 @@
 		event.preventDefault();
 
 		try {
-			const res = await fetch("https://airecipe-backend-2.onrender.com/auth/logout", {
+			const res = await fetch("https://airecipe-backend-2.onrender.com/api/auth/logout", {
 				method: "POST",
 				credentials: "include",
 			});

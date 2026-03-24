@@ -43,11 +43,11 @@
 
   onMount(async () => {
     try {
-      const res = await fetch(`https://airecipe-backend-2.onrender.com/recipe/${recipeId}`);
+      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/${recipeId}`);
       const data = await res.json();
       recipe = data.results;
 
-       const savedRes = await fetch("https://airecipe-backend-2.onrender.com/saved", {
+       const savedRes = await fetch("https://airecipe-backend-2.onrender.com/api/saved", {
         method: "GET",
         credentials: "include"
       });
@@ -67,8 +67,8 @@
 
   async function toggleSave() {
     const endpoint = saved 
-      ? "https://airecipe-backend-2.onrender.com/unsave"
-      : "https://airecipe-backend-2.onrender.com/save";
+      ? "https://airecipe-backend-2.onrender.com/api/unsave"
+      : "https://airecipe-backend-2.onrender.com/api/save";
 
     try {
       const res = await fetch(endpoint, {

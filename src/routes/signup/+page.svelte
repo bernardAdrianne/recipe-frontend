@@ -55,7 +55,7 @@
     try {
       loading = true;
 
-      const res = await fetch('https://airecipe-backend-2.onrender.com/auth/signup', {
+      const res = await fetch('https://airecipe-backend-2.onrender.com/api/auth/signup', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ username, email, password })

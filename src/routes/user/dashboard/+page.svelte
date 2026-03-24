@@ -133,7 +133,7 @@
 
     try {
       const query = ingredientList.join(",");
-      const res = await fetch(`https://airecipe-backend-2.onrender.com/recipe/search?ingredient=${encodeURIComponent(query)}`, {
+      const res = await fetch(`https://airecipe-backend-2.onrender.com/api/recipe/search?ingredient=${encodeURIComponent(query)}`, {
         credentials: "include",
       });
 

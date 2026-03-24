@@ -57,7 +57,7 @@
       loading = true;
       showToast = false;
 
-      const res = await fetch('https://airecipe-backend-2.onrender.com/auth/signin', {
+      const res = await fetch('https://airecipe-backend-2.onrender.com/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
